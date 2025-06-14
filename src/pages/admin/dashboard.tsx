@@ -13,9 +13,16 @@ type Subject = {
   name: string;
 };
 
+type Grade = {
+  id: number;
+  name: string;
+  subjects?: Subject; // または subjects: Subject[] にする（設計による）
+};
+
+
 export default function AdminDashboard() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [grades, setGrades] = useState([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
   const [videos, setVideos] = useState([]);
 
   const [newSubject, setNewSubject] = useState("");
