@@ -11,7 +11,11 @@ import type { License } from "@/types/license";
 import type { Grade } from "@/types/grade"; // 없으면 만들기
 import type { Video } from "@/types/video";
 
-
+function getEmbedUrl(url: string): string {
+  const videoIdMatch = url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
+  const videoId = videoIdMatch?.[1];
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+}
 
 export default function Home() {
   const [schoolCode, setSchoolCode] = useState("");
