@@ -22,7 +22,7 @@ export default function AdminDashboard() {
     gradeId: "",
   });
 
-  const deleteSubject = async (id) => {
+  const deleteSubject = async (id: number) => {
   console.log("🧹 과목 삭제 시도:", id);
 
   // 1. 과목에 연결된 학년 조회
