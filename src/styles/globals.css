@@ -1,5 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 기존 사용자 정의 변수는 유지 */
 @import "tailwindcss";
 
+/* 사용자 정의 색상 등 변수 */
 :root {
   --background: #ffffff;
   --foreground: #171717;
