@@ -60,7 +60,7 @@ export default function Home() {
         .gte("expires_at", new Date().toISOString());
       if (!error) {
         setLicenses(data);
-        const paidGradeIds = data.map((item) => item.grade_id);
+        const paidGradeIds = data.map((item: License) => item.grade_id);
         setPaidGrades(paidGradeIds);
       }
     };
