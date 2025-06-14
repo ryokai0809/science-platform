@@ -2,5 +2,5 @@
 import Stripe from "stripe";
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2023-10-16", // Stripeダッシュボードで推奨される最新APIバージョンに更新してください
+  apiVersion: "2025-05-28.basil", // ← 여기를 변경
 });
