@@ -9,6 +9,8 @@ import type { Subject } from "@/types/subject";
 import toast from "react-hot-toast";
 import type { License } from "@/types/license";
 import type { Grade } from "@/types/grade"; // 없으면 만들기
+import type { Video } from "@/types/video";
+
 
 
 export default function Home() {
@@ -27,7 +29,7 @@ export default function Home() {
   const [licenses, setLicenses] = useState<License[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
-  const [videos, setVideos] = useState([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
 
 
