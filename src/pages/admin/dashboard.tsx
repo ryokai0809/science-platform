@@ -108,7 +108,7 @@ export default function AdminDashboard() {
     fetchData();
   };
 
-  const updateGrade = async (i: number, name: string) => {
+  const updateGrade = async (id: number, name: string) => {
     await supabase.from("grades").update({ name }).eq("id", id);
     setEditingGrade(null);
     fetchData();
