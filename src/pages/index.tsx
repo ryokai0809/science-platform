@@ -17,6 +17,14 @@ function getEmbedUrl(url: string): string {
   return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
 }
 
+type GradeWithSubject = {
+  id: number;
+  name: string;
+  subjects: {
+    name: string;
+  }[];
+};
+
 export default function Home() {
   const [schoolCode, setSchoolCode] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,7 +36,7 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [userLicense, setUserLicense] = useState(null);
-  const [gradesWithSubject, setGradesWithSubject] = useState([]);
+  const [gradesWithSubject, setGradesWithSubject] = useState<GradeWithSubject[]>([]);
   const [paidGrades, setPaidGrades] = useState<number[]>([]);
   const [licenses, setLicenses] = useState<License[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
