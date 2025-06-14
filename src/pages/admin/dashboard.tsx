@@ -87,12 +87,12 @@ export default function AdminDashboard() {
 
 
 
-  const deleteGrade = async (id) => {
+  const deleteGrade = async (id: number) => {
     await supabase.from("grades").delete().eq("id", id);
     fetchData();
   };
 
-  const deleteVideo = async (id) => {
+  const deleteVideo = async (id: number) => {
     await supabase.from("videos").delete().eq("id", id);
     fetchData();
   };
@@ -102,19 +102,19 @@ export default function AdminDashboard() {
   const [editingGrade, setEditingGrade] = useState(null);
   const [editingVideo, setEditingVideo] = useState(null);
 
-  const updateSubject = async (id, name) => {
+  const updateSubject = async (id: number, name: string) => {
     await supabase.from("subjects").update({ name }).eq("id", id);
     setEditingSubject(null);
     fetchData();
   };
 
-  const updateGrade = async (id, name) => {
+  const updateGrade = async (i: number, name: string) => {
     await supabase.from("grades").update({ name }).eq("id", id);
     setEditingGrade(null);
     fetchData();
   };
 
-  const updateVideo = async (id, updated) => {
+  const updateVideo = async (id: number, updated: string) => {
     await supabase.from("videos").update(updated).eq("id", id);
     setEditingVideo(null);
     fetchData();
