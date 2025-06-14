@@ -7,6 +7,8 @@ import { useRouter } from "next/router";
 import getStripe from "../utils/stripe";
 import type { Subject } from "@/types/subject";
 import toast from "react-hot-toast";
+import type { License } from "@/types/license";
+
 
 export default function Home() {
   const [schoolCode, setSchoolCode] = useState("");
@@ -21,7 +23,7 @@ export default function Home() {
   const [userLicense, setUserLicense] = useState(null);
   const [gradesWithSubject, setGradesWithSubject] = useState([]);
   const [paidGrades, setPaidGrades] = useState<number[]>([]);
-  const [licenses, setLicenses] = useState([]);
+  const [licenses, setLicenses] = useState<License[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
   const [videos, setVideos] = useState([]);
