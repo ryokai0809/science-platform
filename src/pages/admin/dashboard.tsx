@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../utils/supabaseClient";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
+import type { Subject } from "@/types/subject";
 
 type Subject = {
   id: number;
@@ -138,14 +139,16 @@ export default function AdminDashboard() {
   }, []);
 
   async function fetchData() {
-    const { data: subjects } = await supabase.from("subjects").select("id, name");
-    const { data: grades } = await supabase
-       .from("grades")
-       .select("id, name, subject_id, subjects(name)");
-    const { data: videos } = await supabase.from("videos").select("*");
-    setSubjects(subjects);
-    setGrades(grades || []);
-    setVideos(videos);
+    const { data: subjects } = await supabase
+  .from("subjects")
+  .select("id, name, subject_id, subjects(name)");
+
+const { data: grades } = await supabase.from("grades").select("id, name");
+const { data: videos } = await supabase.from("videos").select("*");
+
+setSubjects(subjects || []);
+setGrades(grades || []);
+setVideos(videos || []);
   }
 
   async function addSubject() {
