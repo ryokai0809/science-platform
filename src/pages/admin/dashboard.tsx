@@ -84,7 +84,8 @@ export default function AdminDashboard() {
       return;
     }
 
-    const gradeIds = grades?.map((g) => g.id) || [];
+    const gradeIds = grades?.map((g: Grade) => g.id) || [];
+
 
     if (gradeIds.length > 0) {
       const { error: videoDeleteError } = await supabase
