@@ -36,7 +36,7 @@ export default function AdminDashboard() {
     return;
   }
 
-  const gradeIds = grades?.map((g) => g.id) || [];
+  const gradeIds = grades?.map((g: { id: number }) => g.id) || [];
   console.log("📌 연결된 gradeIds:", gradeIds);
 
   // 2. 연결된 영상 삭제
