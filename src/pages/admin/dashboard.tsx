@@ -8,8 +8,13 @@ import { supabase } from "../../utils/supabaseClient";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 
+type Subject = {
+  id: number;
+  name: string;
+};
+
 export default function AdminDashboard() {
-  const [subjects, setSubjects] = useState([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [grades, setGrades] = useState([]);
   const [videos, setVideos] = useState([]);
 
