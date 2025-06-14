@@ -37,9 +37,9 @@ export default function AdminDashboard() {
 
   async function fetchData() {
     const { data: subjects } = await supabase.from("subjects").select("id, name");
-    const { data: grades } = await supabase
-      .from("grades")
-      .select("id, name, subject_id, subjects(name)");
+    const { data: grades }: { data: Grade[] | null } = await supabase
+  .from("grades")
+  .select("id, name, subject_id, subjects(name)");
     const { data: videos } = await supabase.from("videos").select("*");
 
     setSubjects(subjects || []);
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    const gradeIds = (grades as Grade[] | null)?.map((g) => g.id) || [];
+    const gradeIds = grades?.map((g: Grade) => g.id) || [];
 
     if (gradeIds.length > 0) {
       const { error: videoDeleteError } = await supabase
