@@ -25,6 +25,7 @@ export default function AdminDashboard() {
   const [grades, setGrades] = useState<Grade[]>([]);
   const [videos, setVideos] = useState([]);
 
+
   const [newSubject, setNewSubject] = useState("");
   const [newGrade, setNewGrade] = useState({ name: "", subjectId: "" });
   const [newVideo, setNewVideo] = useState({
@@ -110,7 +111,7 @@ export default function AdminDashboard() {
   };
 
    // === 수정用 state ===
-  const [editingSubject, setEditingSubject] = useState(null); // id
+  const [editingSubject, setEditingSubject] = useState<number | null>(null);
   const [editingGrade, setEditingGrade] = useState(null);
   const [editingVideo, setEditingVideo] = useState(null);
 
