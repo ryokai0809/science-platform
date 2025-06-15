@@ -208,11 +208,11 @@ export default function Home() {
               onChange={(e) => setPassword(e.target.value)}
             />
             {isSignUp ? (
-              <Button className="w-full bg-[#EA6137] text-white" onClick={signUp}>
+              <Button className="bg-primary text-white" onClick={signUp}>
                 회원가입
               </Button>
             ) : (
-              <Button className="w-full bg-[#EA6137] text-white" onClick={signIn}>
+              <Button className="bg-primary text-white" onClick={signIn}>
                 로그인
               </Button>
             )}
