@@ -71,7 +71,8 @@ export default function Home() {
       .select("*, grades(id, name, subject(id, name))");
 
     setSubjects(subjectData ?? []);
-    setGradesWithSubject((gradeData ?? []) as Grade[]);
+    setGradesWithSubject((gradeData ?? []) as unknown as Grade[]);
+
     setVideos((videoData ?? []) as Video[]);
   })();
 }, []);
