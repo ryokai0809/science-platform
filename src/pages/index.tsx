@@ -16,7 +16,7 @@ export type Subject = {
 export type Grade = {
   id: number;
   name: string;
-  subjects: Subject; // ❗ 필드명도 일치시켜야 함
+  subjects: Subject[];   // ← 배열로
 };
 
 export type License = {
@@ -29,7 +29,7 @@ export type Video = {
   title: string;
   url: string;
   grade_id: number;
-  grades: Grade;
+  grades: Grade[];       // ← 배열로
 };
 
 const getEmbedUrl = (url: string) => {
