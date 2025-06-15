@@ -16,7 +16,7 @@ export type Subject = {
 export type Grade = {
   id: number;
   name: string;
-  subject: Subject; // ✅ 복수형 X
+  subject: Subject; // ✅ 단수형
 };
 
 export type License = {
@@ -71,9 +71,9 @@ export default function Home() {
       name
     )
   `);
-      const { data: v } = await supabase
-        .from("videos")
-        .select("*, grades(id,name, subjects(id,name))");
+      const { data: g } = await supabase
+  .from("grades")
+  .select("id, name, subject(id, name)");
 
       setSubjects(s ?? []);
       setGradesWithSubject((g ?? []) as Grade[]);
@@ -257,7 +257,7 @@ export default function Home() {
     setSelectedGradeLabel(label);
   }}
 >
-  {`${g.subject?.name ?? ""} ${g.name}`}
+ {`${g.subject?.name ?? ""} ${g.name}`}
 </Button>
 ))}
 
