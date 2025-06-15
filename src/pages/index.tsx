@@ -156,7 +156,7 @@ export default function Home() {
           </div>
         ))}
         {!paid && (
-          <Button className="bg-[#EA6137] text-white" onClick={handlePayment}>
+          <Button className="text-primary" onClick={handlePayment}>
             라이센스 구매 ($70 / 1년)
           </Button>
         )}
