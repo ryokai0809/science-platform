@@ -221,6 +221,14 @@ export default function Home() {
         </Card>
       ) : (
         <>
+        <div className="space-y-8 text-center">
+
+          <img
+  src="/banner.png"
+  alt="배너"
+  className="max-w-xl w-full mx-auto rounded-lg"
+/>
+
           {!selectedGradeId ? (
             <>
               <h2 className="text-2xl font-bold">강의 선택</h2>
@@ -252,7 +260,7 @@ export default function Home() {
               </Button>
             </div>
           )}
-          <div className="text-sm text-gray-400 mt-4">{userEmail} 님</div>
+          </div>
         </>
       )}
     </main>
