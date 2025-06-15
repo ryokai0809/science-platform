@@ -54,7 +54,6 @@ export default function Home() {
 
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
   const [selectedGradeLabel, setSelectedGradeLabel] = useState<string>("");
-  const [showMenu, setShowMenu] = useState(false);
 
   const router = useRouter();
 
@@ -166,32 +165,15 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8 space-y-6">
-      <div className="absolute top-4 left-4 z-10">
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="text-white text-2xl"
-        >
-          ☰
-        </button>
+      <button
+        onClick={() => router.push("/")}
+        className="absolute top-4 left-4 text-white text-2xl"
+      >
+        ☰
+      </button>
 
-       {showMenu && (
-  <div className="mt-2 bg-black shadow rounded p-4 space-y-2">
-    <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
-    <Button
-      className="bg-[#EA6137] text-white rounded-full px-4 py-2 w-full"
-      onClick={() => router.push("/account")} // ← 여기서 계정 페이지로 이동
-    >
-      계정
-    </Button>
-    <Button
-      className="bg-[#EA6137] text-white rounded-full px-4 py-2 w-full"
-      onClick={logout}
-    >
-      로그아웃
-    </Button>
-  </div>
-)}
-
+      <div className="absolute top-4 right-4 text-white bg-black bg-opacity-60 px-3 py-1 rounded-full text-sm">
+        {userEmail}
       </div>
 
       {!isAuthenticated ? (
@@ -226,47 +208,36 @@ export default function Home() {
         </Card>
       ) : (
         <>
-        <div className="space-y-8 text-center">
-
-          <img
-  src="/banner.png"
-  alt="배너"
-  className="max-w-xl w-full mx-auto rounded-lg"
-/>
-
           {!selectedGradeId ? (
             <>
+              <img src="/banner.png" className="max-w-xl w-full mx-auto rounded-lg" />
               <h2 className="text-2xl font-bold">강의 선택</h2>
               <div className="flex flex-wrap gap-4 justify-center">
                 {gradesWithSubject.map((g) => (
-  <Button
-    key={g.id}
-    className="bg-[#EA6137] text-white rounded-full px-6 py-2"
-    onClick={() => {
-      setSelectedGradeId(g.id);
-      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
-      setSelectedGradeLabel(label);
-    }}
-  >
-    {g.subjects?.[0]?.name} {g.name}
-  </Button>
-))}
-
+                  <Button
+                    key={g.id}
+                    className="bg-[#EA6137] text-white rounded-full px-6 py-2"
+                    onClick={() => {
+                      setSelectedGradeId(g.id);
+                      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
+                      setSelectedGradeLabel(label);
+                    }}
+                  >
+                    {g.subjects?.[0]?.name} {g.name}
+                  </Button>
+                ))}
               </div>
             </>
           ) : (
             <div className="space-y-4 w-full max-w-2xl">
               <h3 className="text-xl font-bold">{selectedGradeLabel} 영상 목록</h3>
               {renderVideos()}
-              <Button
-                className="bg-[#EA6137] text-white"
-                onClick={() => setSelectedGradeId(null)}
-              >
+              <Button className="bg-[#EA6137] text-white" onClick={() => setSelectedGradeId(null)}>
                 학년 선택으로 돌아가기
               </Button>
             </div>
           )}
-          </div>
+          <Button className="bg-[#EA6137] text-white" onClick={logout}>로그아웃</Button>
         </>
       )}
     </main>
