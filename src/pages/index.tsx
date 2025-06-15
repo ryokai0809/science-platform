@@ -156,26 +156,53 @@ export default function Home() {
   };
 
   return (
-  <main className="flex min-h-screen flex-col items-center justify-center p-8 text-white">
-    <h1 className="text-2xl mb-4">로그인</h1>
-    <Input
-      type="email"
-      placeholder="이메일"
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      className="mb-2"
-    />
-    <Input
-      type="password"
-      placeholder="비밀번호"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      className="mb-4"
-    />
-    <div className="flex gap-2">
-      <Button onClick={handleSignIn}>로그인</Button>
-      <Button variant="secondary" onClick={handleSignUp}>회원가입</Button>
-    </div>
+  <main className="flex min-h-screen flex-col items-center justify-center p-8">
+    {!isAuthenticated ? (
+      <div className="w-full max-w-md space-y-4">
+        <h1 className="text-2xl font-bold text-center">로그인</h1>
+        <Input
+          placeholder="이메일"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Input
+          placeholder="비밀번호"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button onClick={isSignUp ? handleSignUp : handleSignIn}>
+          {isSignUp ? "회원가입" : "로그인"}
+        </Button>
+        <Button variant="ghost" onClick={() => setIsSignUp(!isSignUp)}>
+          {isSignUp ? "로그인 화면으로" : "회원가입하기"}
+        </Button>
+      </div>
+    ) : (
+      <div className="space-y-6 w-full max-w-2xl">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold">학년 선택</h2>
+          <Button onClick={handleLogout}>로그아웃</Button>
+        </div>
+        <select
+          value={selectedGrade}
+          onChange={(e) => setSelectedGrade(e.target.value)}
+          className="w-full p-2 border"
+        >
+          <option value="">학년 선택</option>
+          {gradesWithSubject.map((g) => (
+            <option
+              key={g.id}
+              value={`${g.subjects[0]?.name || ""} ${g.name}`}
+              onClick={() => setSelectedGradeId(g.id)}
+            >
+              {`${g.subjects[0]?.name || ""} ${g.name}`}
+            </option>
+          ))}
+        </select>
+        {selectedGrade && renderVideos()}
+      </div>
+    )}
   </main>
 );
 
