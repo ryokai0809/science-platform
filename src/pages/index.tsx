@@ -15,7 +15,7 @@ import type { License } from "@/types/license";
 type GradeWithSubject = {
   id: number;
   name: string;
-  subjects: { name: string }[];
+  subjects: { name: string }[]
 };
 
 function getEmbedUrl(url: string): string {
@@ -40,8 +40,6 @@ export default function Home() {
   const [paidGrades, setPaidGrades] = useState<number[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
-
-
   const [videos, setVideos] = useState<Video[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [licenses, setLicenses] = useState<License[]>([]);
@@ -260,13 +258,13 @@ export default function Home() {
           key={grade.id}
           className="bg-primary text-white rounded-full px-6 py-2"
           onClick={() => {
-            const label = `${grade.subjects?.name} ${grade.name}`;
+            const label = `${grade.subjects?.[0]?.name ?? ""} ${grade.name}`;
             setSelectedGrade(label);
             setSelectedGradeId(grade.id);
             localStorage.setItem("selectedGrade", label);
           }}
         >
-          {grade.subjects?.name} {grade.name}
+          {grade.subjects?.[0]?.name ?? ""} {grade.name}
         </Button>
       ))}
     </div>
