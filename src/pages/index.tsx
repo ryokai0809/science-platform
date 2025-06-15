@@ -16,7 +16,7 @@ export type Subject = {
 export type Grade = {
   id: number;
   name: string;
-  subjects: Subject[];   // ← 배열로
+  subject: Subject; // ❗단수형!
 };
 
 export type License = {
@@ -66,8 +66,8 @@ export default function Home() {
       .select("id, name");
 
     const { data: gradeData } = await supabase
-      .from("grades")
-      .select("id, name, subjects(id, name)");
+  .from("grades")
+  .select("id, name, subject(id, name)");
 
     const { data: videoData, error: videoError } = await supabase
       .from("videos")
@@ -97,7 +97,7 @@ export default function Home() {
     setVideos((videoData ?? []) as Video[]);
   })();
 }, []);
-
+ 
 
 
   useEffect(() => {
@@ -271,12 +271,12 @@ export default function Home() {
     key={g.id}
     className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
     onClick={() => {
-      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
+      const label = `${g.subject?.name ?? ""} ${g.name}`.trim();
       setSelectedGradeId(g.id);
       setSelectedGradeLabel(label);
     }}
   >
-    {`${g.subjects?.[0]?.name ?? ""} ${g.name}`}
+    {`${g.subject?.name ?? ""} ${g.name}`}
   </Button>
 ))}
 
