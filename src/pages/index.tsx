@@ -44,6 +44,9 @@ export default function Home() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
 
+  // index.tsx 상단 근처
+const goToAccountPage = () => router.push("/account");
+
 
   const now = new Date();
   const license = licenses.find(l => l.grade_id === selectedGradeId);
@@ -157,53 +160,114 @@ export default function Home() {
 
   return (
   <main className="flex min-h-screen flex-col items-center justify-center p-8">
-    {!isAuthenticated ? (
-      <div className="w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold text-center">로그인</h1>
-        <Input
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          placeholder="비밀번호"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button onClick={isSignUp ? handleSignUp : handleSignIn}>
-          {isSignUp ? "회원가입" : "로그인"}
-        </Button>
-        <Button variant="ghost" onClick={() => setIsSignUp(!isSignUp)}>
-          {isSignUp ? "로그인 화면으로" : "회원가입하기"}
-        </Button>
-      </div>
-    ) : (
-      <div className="space-y-6 w-full max-w-2xl">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">학년 선택</h2>
-          <Button onClick={handleLogout}>로그아웃</Button>
-        </div>
-        <select
-          value={selectedGrade}
-          onChange={(e) => setSelectedGrade(e.target.value)}
-          className="w-full p-2 border"
-        >
-          <option value="">학년 선택</option>
-          {gradesWithSubject.map((g) => (
-            <option
-              key={g.id}
-              value={`${g.subjects[0]?.name || ""} ${g.name}`}
-              onClick={() => setSelectedGradeId(g.id)}
-            >
-              {`${g.subjects[0]?.name || ""} ${g.name}`}
-            </option>
-          ))}
-        </select>
-        {selectedGrade && renderVideos()}
-      </div>
-    )}
-  </main>
-);
 
+<div className="absolute top-4 left-4 z-10">
+  <button onClick={() => setShowMenu(!showMenu)} className="text-white text-2xl">
+    ☰
+  </button>
+
+  {showMenu && (
+    <div className="mt-2 bg-black shadow rounded p-4 space-y-2">
+      <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
+      {isAuthenticated && (
+        <>
+         <Button className="bg-primary text-white rounded-full px-4 py-2 w-full" onClick={goToAccountPage}>
+  계정
+</Button>
+
+          <Button
+            className="bg-primary text-white rounded-full px-4 py-2 w-full"
+            onClick={handleLogout}
+          >
+            로그아웃
+          </Button>
+        </>
+      )}
+    </div>
+  )}
+</div>
+      {!isAuthenticated ? (
+        <Card className="w-full max-w-md">
+  <CardContent className="space-y-4">
+    <h1 className="text-xl font-bold text-center">
+      {isSignUp ? "회원가입" : "로그인"}
+    </h1>
+    <Input
+      placeholder="이메일"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+    />
+    <Input
+      placeholder="비밀번호"
+      type="password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+    {isSignUp ? (
+      <Button onClick={handleSignUp} className="w-full bg-primary text-white rounded-full">
+        회원가입
+      </Button>
+    ) : (
+      <Button onClick={handleSignIn} className="w-full bg-primary text-white rounded-full">
+        로그인
+      </Button>
+    )}
+    <div className="text-center text-sm">
+      {isSignUp ? (
+        <>
+          이미 계정이 있으신가요?{" "}
+          <button onClick={() => setIsSignUp(false)} className="underline">
+            로그인
+          </button>
+        </>
+      ) : (
+        <>
+          아직 회원이 아니신가요?{" "}
+          <button onClick={() => setIsSignUp(true)} className="underline">
+            회원가입
+          </button>
+        </>
+      )}
+    </div>
+  </CardContent>
+</Card>
+
+      ) : (
+        <div className="space-y-8 text-center">
+          {!selectedGrade ? (
+            <>
+              <h2 className="text-2xl font-bold">학년 선택</h2>
+
+              <div className="flex flex-wrap gap-4 justify-center">
+  {gradesWithSubject.map((grade) => (
+    <Button
+      key={grade.id}
+      className="bg-primary text-white rounded-full px-6 py-2"
+      onClick={() => {
+        const label = `${grade.subjects[0]?.name} ${grade.name}`;
+        setSelectedGrade(label);
+        setSelectedGradeId(grade.id);
+        localStorage.setItem("selectedGrade", label);
+      }}
+    >
+      {grade.subjects[0]?.name} {grade.name}
+    </Button>
+  ))}
+</div>
+            </>
+          ) : (
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold">{selectedGrade} 영상 목록</h3>
+              {renderVideos(
+                
+              )}
+              <div className="space-x-2">
+                <Button className="bg-primary text-white rounded-full px-6 py-2" onClick={() => setSelectedGrade("")}>학년 선택으로 돌아가기</Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </main>
+  );
 }
