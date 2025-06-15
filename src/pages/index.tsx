@@ -264,7 +264,7 @@ export default function Home() {
                 className="bg-[#EA6137] text-white"
                 onClick={() => setSelectedGradeId(null)}
               >
-                학년 선택으로 돌아가기
+                학년 선택
               </Button>
             </div>
           )}
