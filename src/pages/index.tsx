@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import getStripe from "../utils/stripe";
 import type { Subject } from "@/types/subject";
 import toast from "react-hot-toast";
+import type { Grade } from "@/types/grade"; // 없으면 만들기
 
 type License = {
   grade_id: number;
@@ -30,6 +31,7 @@ export default function Home() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
   const [videos, setVideos] = useState([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
 
   const now = new Date();
   const license = licenses.find(l => l.grade_id === selectedGradeId);
