@@ -29,9 +29,12 @@ export type Video = {
   title: string;
   url: string;
   grade_id: number;
-  grades: Grade[];       // ← 배열로
+  grades: {
+    id: number;
+    name: string;
+    subjects: Subject[]; // ← subjectsは配列
+  }[];
 };
-
 const getEmbedUrl = (url: string) => {
   if (url.includes("/shorts/")) return url.replace("/shorts/", "/embed/");
   const m = url.match(/(?:v=|\/embed\/|\.be\/)([\w-]{11})/);
