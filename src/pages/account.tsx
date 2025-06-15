@@ -30,17 +30,17 @@ export default function AccountPage() {
       <h1 className="text-2xl font-bold mb-4">계정 정보</h1>
 
       <Button 
-      className="mt-6 bg-primary text-white rounded-full px-6 py-2"
+      className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
       onClick={() => router.push("/history")}
       >
   결제 이력
 </Button>
 
       <Button
-  className="mt-6 bg-primary text-white rounded-full px-6 py-2"
+  className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
   onClick={() => router.push("/")}
 >
-  학년 선택 돌아가기
+  강의 선택
 </Button>
 
     </div>
