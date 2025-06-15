@@ -52,6 +52,10 @@ export default function Home() {
   const isExpired = license ? new Date(license.expires_at) < new Date() : true;
   const hasPaid = !!license && !isExpired;
 
+  const goToAccountPage = () => {
+  router.push("/account");
+};
+
 
   const router = useRouter();
 
