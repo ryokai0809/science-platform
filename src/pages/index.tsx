@@ -174,19 +174,24 @@ export default function Home() {
           ☰
         </button>
 
-        {showMenu && (
-          <div className="mt-2 bg-black shadow rounded p-4 space-y-2">
-            <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
-            {isAuthenticated && (
-              <Button
-                className="bg-orange-500 text-white rounded-full px-4 py-2 w-full"
-                onClick={logout}
-              >
-                로그아웃
-              </Button>
-            )}
-          </div>
-        )}
+       {showMenu && (
+  <div className="mt-2 bg-black shadow rounded p-4 space-y-2">
+    <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
+    <Button
+      className="bg-orange-500 text-white rounded-full px-4 py-2 w-full"
+      onClick={() => router.push("/account")} // ← 여기서 계정 페이지로 이동
+    >
+      계정
+    </Button>
+    <Button
+      className="bg-orange-500 text-white rounded-full px-4 py-2 w-full"
+      onClick={logout}
+    >
+      로그아웃
+    </Button>
+  </div>
+)}
+
       </div>
 
       {!isAuthenticated ? (
@@ -234,18 +239,19 @@ export default function Home() {
               <h2 className="text-2xl font-bold">강의 선택</h2>
               <div className="flex flex-wrap gap-4 justify-center">
                 {gradesWithSubject.map((g) => (
-                  <Button
-                    key={g.id}
-                    className="bg-orange-500 text-white rounded-full px-6 py-2"
-                    onClick={() => {
-                      setSelectedGradeId(g.id);
-                      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
-                      setSelectedGradeLabel(label);
-                    }}
-                  >
-                    {g.subjects?.[0]?.name} {g.name}
-                  </Button>
-                ))}
+  <Button
+    key={g.id}
+    className="bg-orange-500 text-white rounded-full px-6 py-2"
+    onClick={() => {
+      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`;
+      setSelectedGradeId(g.id);
+      setSelectedGradeLabel(label);
+    }}
+  >
+    {g.subjects?.[0]?.name} {g.name}
+  </Button>
+))}
+
               </div>
             </>
           ) : (
@@ -253,7 +259,7 @@ export default function Home() {
               <h3 className="text-xl font-bold">{selectedGradeLabel} 영상 목록</h3>
               {renderVideos()}
               <Button
-                className="bg-primary text-white rounded-full px-6 py-2" 
+                className="bg-orange-500 text-white"
                 onClick={() => setSelectedGradeId(null)}
               >
                 학년 선택으로 돌아가기
