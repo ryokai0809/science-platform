@@ -7,7 +7,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-blue-600 text-white hover:bg-blue-700",
+        default: "bg-primary text-white hover:bg-primary/90", // 수정
         ghost: "bg-transparent hover:bg-gray-100 text-gray-800",
       },
     },
