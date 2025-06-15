@@ -63,7 +63,7 @@ export default function Home() {
       const { data: s } = await supabase.from("subjects").select("id,name");
       const { data: g } = await supabase
         .from("grades")
-        .select("id,name, subjects(id,name)");
+        .select("id,name,subjects:subjects(id,name)");
       const { data: v } = await supabase
         .from("videos")
         .select("*, grades(id,name, subjects(id,name))");
