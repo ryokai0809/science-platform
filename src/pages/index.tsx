@@ -54,6 +54,7 @@ export default function Home() {
 
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
   const [selectedGradeLabel, setSelectedGradeLabel] = useState<string>("");
+  const [showMenu, setShowMenu] = useState(false);
 
   const router = useRouter();
 
@@ -155,7 +156,7 @@ export default function Home() {
           </div>
         ))}
         {!paid && (
-          <Button className="bg-primary text-white" onClick={handlePayment}>
+          <Button className="bg-orange-500 text-white" onClick={handlePayment}>
             라이센스 구매 (₩120,000 / 1년)
           </Button>
         )}
@@ -165,12 +166,28 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8 space-y-6">
-      <button
-        onClick={() => router.push("/")}
-        className="absolute top-4 left-4 text-black text-2xl"
-      >
-        ☰
-      </button>
+      <div className="absolute top-4 left-4 z-10">
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="text-white text-2xl"
+        >
+          ☰
+        </button>
+
+        {showMenu && (
+          <div className="mt-2 bg-black shadow rounded p-4 space-y-2">
+            <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
+            {isAuthenticated && (
+              <Button
+                className="bg-orange-500 text-white rounded-full px-4 py-2 w-full"
+                onClick={logout}
+              >
+                로그아웃
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
 
       {!isAuthenticated ? (
         <Card className="w-full max-w-md">
@@ -186,11 +203,11 @@ export default function Home() {
               onChange={(e) => setPassword(e.target.value)}
             />
             {isSignUp ? (
-              <Button className="w-full bg-primary text-white" onClick={signUp}>
+              <Button className="w-full bg-orange-500 text-white" onClick={signUp}>
                 회원가입
               </Button>
             ) : (
-              <Button className="w-full bg-primary text-white" onClick={signIn}>
+              <Button className="w-full bg-orange-500 text-white" onClick={signIn}>
                 로그인
               </Button>
             )}
@@ -211,7 +228,7 @@ export default function Home() {
                 {gradesWithSubject.map((g) => (
                   <Button
                     key={g.id}
-                    className="bg-primary text-white"
+                    className="bg-orange-500 text-white rounded-full px-6 py-2"
                     onClick={() => {
                       setSelectedGradeId(g.id);
                       const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
@@ -227,13 +244,15 @@ export default function Home() {
             <div className="space-y-4 w-full max-w-2xl">
               <h3 className="text-xl font-bold">{selectedGradeLabel} 영상 목록</h3>
               {renderVideos()}
-              <Button className="bg-primary text-white" onClick={() => setSelectedGradeId(null)}>
+              <Button
+                className="bg-orange-500 text-white"
+                onClick={() => setSelectedGradeId(null)}
+              >
                 학년 선택으로 돌아가기
               </Button>
             </div>
           )}
-          <div className="text-sm text-gray-500 mt-4">{userEmail} 님</div>
-          <Button className="bg-primary text-white" onClick={logout}>로그아웃</Button>
+          <div className="text-sm text-gray-400 mt-4">{userEmail} 님</div>
         </>
       )}
     </main>
