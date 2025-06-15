@@ -178,13 +178,13 @@ export default function Home() {
   <div className="mt-2 bg-black shadow rounded p-4 space-y-2">
     <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
     <Button
-      className="bg-[#EA6137] text-white rounded-full px-4 py-2 w-full"
+      className="bg-primary text-white px-6 py-2 rounded-full"
       onClick={() => router.push("/account")} // ← 여기서 계정 페이지로 이동
     >
       계정
     </Button>
     <Button
-      className="bg-[#EA6137] text-white rounded-full px-4 py-2 w-full"
+      className="bg-primary text-white px-6 py-2 rounded-full"
       onClick={logout}
     >
       로그아웃
@@ -208,11 +208,11 @@ export default function Home() {
               onChange={(e) => setPassword(e.target.value)}
             />
             {isSignUp ? (
-              <Button className="bg-primary text-white" onClick={signUp}>
+              <Button className="bg-primary text-white px-6 py-2 rounded-full" onClick={signUp}>
                 회원가입
               </Button>
             ) : (
-              <Button className="bg-primary text-white" onClick={signIn}>
+              <Button className="bg-primary text-white px-6 py-2 rounded-full" onClick={signIn}>
                 로그인
               </Button>
             )}
@@ -243,7 +243,7 @@ export default function Home() {
                 {gradesWithSubject.map((g) => (
   <Button
     key={g.id}
-    className="bg-[#EA6137] text-white rounded-full px-6 py-2"
+    className="bg-primary text-white px-6 py-2 rounded-full"
     onClick={() => {
       setSelectedGradeId(g.id);
       const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
@@ -261,7 +261,7 @@ export default function Home() {
               <h3 className="text-xl font-bold">{selectedGradeLabel} 영상 목록</h3>
               {renderVideos()}
               <Button
-                className="bg-[#EA6137] text-white"
+                className="bg-primary text-white px-6 py-2 rounded-full"
                 onClick={() => setSelectedGradeId(null)}
               >
                 강의 선택
