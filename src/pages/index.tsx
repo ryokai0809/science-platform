@@ -243,8 +243,8 @@ export default function Home() {
     key={g.id}
     className="bg-orange-500 text-white rounded-full px-6 py-2"
     onClick={() => {
-      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`;
       setSelectedGradeId(g.id);
+      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
       setSelectedGradeLabel(label);
     }}
   >
