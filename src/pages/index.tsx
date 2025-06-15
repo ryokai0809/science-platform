@@ -7,12 +7,17 @@ import { useRouter } from "next/router";
 import getStripe from "../utils/stripe";
 import type { Subject } from "@/types/subject";
 import toast from "react-hot-toast";
-import type { Grade } from "@/types/grade"; // 없으면 만들기
 
-type License = {
-  grade_id: number;
-  expires_at: string;
+import type { Grade } from "@/types/grade"; // 없으면 만들기
+import type { Video } from "@/types/video";
+import type { License } from "@/types/license";
+
+type GradeWithSubject = {
+  id: number;
+  name: string;
+  subjects: { name: string }[];
 };
+
 
 export default function Home() {
   const [schoolCode, setSchoolCode] = useState("");
@@ -25,13 +30,15 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [userLicense, setUserLicense] = useState(null);
-  const [gradesWithSubject, setGradesWithSubject] = useState([]);
   const [paidGrades, setPaidGrades] = useState<number[]>([]);
-  const [licenses, setLicenses] = useState<License[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
-  const [videos, setVideos] = useState([]);
+
+
+  const [videos, setVideos] = useState<Video[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
+  const [licenses, setLicenses] = useState<License[]>([]);
+  const [gradesWithSubject, setGradesWithSubject] = useState<GradeWithSubject[]>([]);
 
   const now = new Date();
   const license = licenses.find(l => l.grade_id === selectedGradeId);
