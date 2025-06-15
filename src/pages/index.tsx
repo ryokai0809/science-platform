@@ -18,6 +18,13 @@ type GradeWithSubject = {
   subjects: { name: string }[];
 };
 
+function getEmbedUrl(url: string): string {
+  const videoIdMatch = url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
+  const videoId = videoIdMatch?.[1];
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+}
+
+
 
 export default function Home() {
   const [schoolCode, setSchoolCode] = useState("");
