@@ -271,12 +271,12 @@ export default function Home() {
     key={g.id}
     className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
     onClick={() => {
-      const label = `${g.subjects?.name ?? ""} ${g.name}`.trim(); // ex: "중학교 과학 1학년"
+      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
       setSelectedGradeId(g.id);
       setSelectedGradeLabel(label);
     }}
   >
-    {`${g.subjects?.name ?? ""} ${g.name}`}
+    {`${g.subjects?.[0]?.name ?? ""} ${g.name}`}
   </Button>
 ))}
 
