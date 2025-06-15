@@ -253,7 +253,7 @@ export default function Home() {
               <h3 className="text-xl font-bold">{selectedGradeLabel} 영상 목록</h3>
               {renderVideos()}
               <Button
-                className="bg-orange-500 text-white"
+                className="bg-primary text-white rounded-full px-6 py-2" 
                 onClick={() => setSelectedGradeId(null)}
               >
                 학년 선택으로 돌아가기
