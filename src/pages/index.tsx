@@ -56,26 +56,48 @@ export default function Home() {
   const [selectedGradeLabel, setSelectedGradeLabel] = useState<string>("");
   const [showMenu, setShowMenu] = useState(false);
 
+
   const router = useRouter();
 
   useEffect(() => {
   (async () => {
-    const { data: subjectData } = await supabase.from("subjects").select("id, name");
+    const { data: subjectData } = await supabase
+      .from("subjects")
+      .select("id, name");
 
     const { data: gradeData } = await supabase
-  .from("grades")
-  .select("id, name, subjects(id, name)"); // ❗ subjects (복수형!)
+      .from("grades")
+      .select("id, name, subjects(id, name)");
 
-    const { data: videoData } = await supabase
+    const { data: videoData, error: videoError } = await supabase
       .from("videos")
-      .select("*, grades(id, name, subject(id, name))");
+      .select(`
+    id,
+    title,
+    url,
+    grade_id,
+    grades (
+      id,
+      name,
+      subjects (
+        id,
+        name
+      )
+    )
+  `);
+
+    if (videoError) {
+      console.error("❌ videoData error", videoError);
+    }
+
+    console.log("🎥 videoData", videoData); // ← 콘솔 확인
 
     setSubjects(subjectData ?? []);
     setGradesWithSubject((gradeData ?? []) as unknown as Grade[]);
-
     setVideos((videoData ?? []) as Video[]);
   })();
 }, []);
+
 
 
   useEffect(() => {
