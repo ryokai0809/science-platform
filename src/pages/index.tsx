@@ -246,7 +246,7 @@ export default function Home() {
     className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
     onClick={() => {
       setSelectedGradeId(g.id);
-      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
+      const label = `${g.name} ${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim(); // ❗ 중복되는 g.name 제거는 아래 참고
       setSelectedGradeLabel(label);
     }}
   >

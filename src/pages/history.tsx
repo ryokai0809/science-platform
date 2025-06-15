@@ -43,7 +43,7 @@ export default function HistoryPage() {
       <h1 className="text-2xl font-bold mb-6 text-center">결제 이력</h1>
 
       {history.length === 0 ? (
-        <p className="text-gray-600 text-center">결제 이력이 없습니다.</p>
+        <p className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important">결제 이력이 없습니다.</p>
       ) : (
 <table className="w-full text-sm text-left border border-gray-600 text-white">
   <thead className="bg-gray-800 text-white">
@@ -68,10 +68,10 @@ export default function HistoryPage() {
       <div className="mt-6 flex justify-center">
 
             <Button
-  className="mt-6 bg-primary text-white rounded-full px-6 py-2"
+  className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
   onClick={() => router.push("/")}
 >
-  학년 선택 돌아가기
+  강의 선택
 </Button>
      </div>
     </main>
