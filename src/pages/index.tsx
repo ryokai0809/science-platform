@@ -156,8 +156,27 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      {/* 생략: 로그인 폼 및 강의 선택 UI */}
-    </main>
-  );
+  <main className="flex min-h-screen flex-col items-center justify-center p-8 text-white">
+    <h1 className="text-2xl mb-4">로그인</h1>
+    <Input
+      type="email"
+      placeholder="이메일"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      className="mb-2"
+    />
+    <Input
+      type="password"
+      placeholder="비밀번호"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      className="mb-4"
+    />
+    <div className="flex gap-2">
+      <Button onClick={handleSignIn}>로그인</Button>
+      <Button variant="secondary" onClick={handleSignUp}>회원가입</Button>
+    </div>
+  </main>
+);
+
 }
