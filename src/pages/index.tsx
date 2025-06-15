@@ -76,7 +76,7 @@ export default function Home() {
     title,
     url,
     grade_id,
-    grades (
+    grades!videos_grade_id_fkey (
       id,
       name,
       subjects (
