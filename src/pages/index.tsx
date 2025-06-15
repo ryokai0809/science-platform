@@ -258,12 +258,14 @@ export default function Home() {
             <div className="space-y-4 w-full max-w-2xl">
               <h3 className="text-xl font-bold">{selectedGradeLabel} 영상 목록</h3>
               {renderVideos()}
+              <div className="space-x-2">
               <Button
                 className="bg-orange-500 text-white"
                 onClick={() => setSelectedGradeId(null)}
               >
                 학년 선택으로 돌아가기
               </Button>
+              </div>
             </div>
           )}
           </div>
