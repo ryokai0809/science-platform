@@ -16,7 +16,7 @@ export type Subject = {
 export type Grade = {
   id: number;
   name: string;
-  subject: Subject; // ✅ 단수형
+  subjects: Subject; // ❗ 필드명도 일치시켜야 함
 };
 
 export type License = {
@@ -63,8 +63,8 @@ export default function Home() {
     const { data: subjectData } = await supabase.from("subjects").select("id, name");
 
     const { data: gradeData } = await supabase
-      .from("grades")
-      .select("id, name, subject(id, name)");
+  .from("grades")
+  .select("id, name, subjects(id, name)"); // ❗ subjects (복수형!)
 
     const { data: videoData } = await supabase
       .from("videos")
@@ -249,12 +249,12 @@ export default function Home() {
     key={g.id}
     className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
     onClick={() => {
-      const label = `${g.subject?.name ?? ""} ${g.name}`.trim(); // ex: "중학교 과학 1학년"
+      const label = `${g.subjects?.name ?? ""} ${g.name}`.trim(); // ex: "중학교 과학 1학년"
       setSelectedGradeId(g.id);
       setSelectedGradeLabel(label);
     }}
   >
-    {`${g.subject?.name ?? ""} ${g.name}`}
+    {`${g.subjects?.name ?? ""} ${g.name}`}
   </Button>
 ))}
 
