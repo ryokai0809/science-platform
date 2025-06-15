@@ -156,7 +156,7 @@ export default function Home() {
           </div>
         ))}
         {!paid && (
-          <Button className="text-primary" onClick={handlePayment}>
+          <Button className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important" onClick={handlePayment}>
             라이센스 구매 ($70 / 1년)
           </Button>
         )}
