@@ -246,7 +246,7 @@ export default function Home() {
     className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
     onClick={() => {
       const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
-      setSelectedGradeId(g.id);
+      setSelectedGradeId(g.id); 
       setSelectedGradeLabel(label);
     }}
   >
