@@ -59,27 +59,23 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    (async () => {
-      const { data: s } = await supabase.from("subjects").select("id,name");
-      const { data: g } = await supabase
-  .from("grades")
-  .select(`
-    id,
-    name,
-    subject (
-      id,
-      name
-    )
-  `);
-      const { data: g } = await supabase
-  .from("grades")
-  .select("id, name, subject(id, name)");
+  (async () => {
+    const { data: subjectData } = await supabase.from("subjects").select("id, name");
 
-      setSubjects(s ?? []);
-      setGradesWithSubject((g ?? []) as Grade[]);
-      setVideos((v ?? []) as Video[]);
-    })();
-  }, []);
+    const { data: gradeData } = await supabase
+      .from("grades")
+      .select("id, name, subject(id, name)");
+
+    const { data: videoData } = await supabase
+      .from("videos")
+      .select("*, grades(id, name, subject(id, name))");
+
+    setSubjects(subjectData ?? []);
+    setGradesWithSubject((gradeData ?? []) as Grade[]);
+    setVideos((videoData ?? []) as Video[]);
+  })();
+}, []);
+
 
   useEffect(() => {
     (async () => {
@@ -249,17 +245,18 @@ export default function Home() {
               <div className="flex flex-wrap gap-4 justify-center">
                 {gradesWithSubject.map((g) => (
   <Button
-  key={g.id}
-  className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
-  onClick={() => {
-    const label = `${g.subject?.name ?? ""} ${g.name}`.trim();
-    setSelectedGradeId(g.id); 
-    setSelectedGradeLabel(label);
-  }}
->
- {`${g.subject?.name ?? ""} ${g.name}`}
-</Button>
+    key={g.id}
+    className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
+    onClick={() => {
+      const label = `${g.subject?.name ?? ""} ${g.name}`.trim(); // ex: "중학교 과학 1학년"
+      setSelectedGradeId(g.id);
+      setSelectedGradeLabel(label);
+    }}
+  >
+    {`${g.subject?.name ?? ""} ${g.name}`}
+  </Button>
 ))}
+
 
               </div>
             </>
