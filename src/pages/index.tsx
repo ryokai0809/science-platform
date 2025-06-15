@@ -157,7 +157,7 @@ export default function Home() {
         ))}
         {!paid && (
           <Button className="bg-[#EA6137] text-white" onClick={handlePayment}>
-            라이센스 구매 (₩120,000 / 1년)
+            라이센스 구매 ($70 / 1년)
           </Button>
         )}
       </div>
@@ -237,6 +237,8 @@ export default function Home() {
           {!selectedGradeId ? (
             <>
               <h2 className="text-2xl font-bold">강의 선택</h2>
+
+
               <div className="flex flex-wrap gap-4 justify-center">
                 {gradesWithSubject.map((g) => (
   <Button
