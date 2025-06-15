@@ -54,7 +54,8 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: subjects } = await supabase.from("subjects").select("id, name, subject_id, subjects(name)");
+      // subjects는 단순하게
+      const { data: subjects } = await supabase.from("subjects").select("id, name");
       const { data: grades } = await supabase.from("grades").select("id, name");
       const { data: videos } = await supabase.from("videos").select("*");
       setSubjects(subjects || []);
