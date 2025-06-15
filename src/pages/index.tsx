@@ -1,291 +1,258 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
-import { supabase } from "../utils/supabaseClient";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import getStripe from "../utils/stripe";
-import type { Subject } from "@/types/subject";
 import toast from "react-hot-toast";
 
-import type { Grade } from "@/types/grade"; // 없으면 만들기
-import type { Video } from "@/types/video";
-import type { License } from "@/types/license";
-
-type GradeWithSubject = {
+/*
+───────────────────────────────────────────────────────────
+🔖  Type Definitions
+───────────────────────────────────────────────────────────*/
+export type Subject = {
   id: number;
   name: string;
-  subjects: { name: string }[]
 };
 
-function getEmbedUrl(url: string): string {
-  const videoIdMatch = url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
-  const videoId = videoIdMatch?.[1];
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
-}
+export type Grade = {
+  id: number;
+  name: string;
+  /** 1 학년에 여러 과목이 연결돼 있을 수도 있으니 배열로 보관 */
+  subjects: Subject[];
+};
 
+export type License = {
+  grade_id: number;
+  expires_at: string;
+};
 
+export type Video = {
+  id: number;
+  title: string;
+  url: string;
+  grade_id: number;
+  grades: Grade; // Supabase join 결과가 들어옴
+};
 
+/*
+───────────────────────────────────────────────────────────
+🔗  외부 모듈 / 유틸
+───────────────────────────────────────────────────────────*/
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/utils/supabaseClient";
+import getStripe from "@/utils/stripe";
+
+/*
+───────────────────────────────────────────────────────────
+🧩  Helper
+───────────────────────────────────────────────────────────*/
+const getEmbedUrl = (url: string) => {
+  if (url.includes("/shorts/")) return url.replace("/shorts/", "/embed/");
+  const m = url.match(/(?:v=|\/embed\/|\.be\/)([\w-]{11})/);
+  return m ? `https://www.youtube.com/embed/${m[1]}` : url;
+};
+
+/*
+───────────────────────────────────────────────────────────
+🏠  페이지 컴포넌트
+───────────────────────────────────────────────────────────*/
 export default function Home() {
-  const [schoolCode, setSchoolCode] = useState("");
+  /* ──────────  상태  ────────── */
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [selectedGrade, setSelectedGrade] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [userLicense, setUserLicense] = useState(null);
-  const [paidGrades, setPaidGrades] = useState<number[]>([]);
+  const [userEmail, setUserEmail] = useState("");
+
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
+  const [gradesWithSubject, setGradesWithSubject] = useState<Grade[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
-  const [grades, setGrades] = useState<Grade[]>([]);
+
   const [licenses, setLicenses] = useState<License[]>([]);
-  const [gradesWithSubject, setGradesWithSubject] = useState<GradeWithSubject[]>([]);
+  const [paidGrades, setPaidGrades] = useState<number[]>([]);
 
-  const now = new Date();
-  const license = licenses.find(l => l.grade_id === selectedGradeId);
-  const isExpired = license ? new Date(license.expires_at) < new Date() : true;
-  const hasPaid = !!license && !isExpired;
+  const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
+  const [selectedGradeLabel, setSelectedGradeLabel] = useState<string>("");
 
-  const goToAccountPage = () => {
-  router.push("/account");
-};
-
-
+  /* ──────────  라우터 & 토스트  ────────── */
   const router = useRouter();
+  const goToAccountPage = () => router.push("/account");
 
+  /* ──────────  최초 데이터 로드  ────────── */
   useEffect(() => {
-    const fetchData = async () => {
-      const { data: subjects } = await supabase.from("subjects").select("id, name, subject_id, subjects(name)");
-      const { data: grades } = await supabase.from("grades").select("id, name");
-      const { data: videos } = await supabase.from("videos").select("*");
-      setSubjects(subjects || []);
-      setGrades(grades || []);
-      setVideos(videos || []);
-    };
-    fetchData();
+    (async () => {
+      const { data: s } = await supabase.from("subjects").select("id,name");
+      const { data: g } = await supabase
+        .from("grades")
+        .select("id,name, subjects(id,name)");
+      const { data: v } = await supabase
+        .from("videos")
+        .select("*, grades(id,name, subjects(id,name))");
+
+      setSubjects(s ?? []);
+      setGradesWithSubject((g ?? []) as Grade[]);
+      setVideos((v ?? []) as Video[]);
+    })();
   }, []);
 
+  /* ──────────  라이센스 로드  ────────── */
   useEffect(() => {
-    const fetchLicenses = async () => {
-      const userEmail = localStorage.getItem("userEmail");
+    (async () => {
+      const u = localStorage.getItem("userEmail");
+      if (!u) return;
       const { data, error } = await supabase
         .from("licenses")
-        .select("*, grades(id, name, subjects(name))")
-        .eq("user_email", userEmail)
+        .select("grade_id, expires_at")
+        .eq("user_email", u)
         .gte("expires_at", new Date().toISOString());
-      if (!error) {
-        setLicenses(data);
-        const paidGradeIds = data.map((item) => item.grade_id);
-        setPaidGrades(paidGradeIds);
+      if (error) {
+        console.error(error.message);
+        return;
       }
-    };
-    fetchLicenses();
+      setLicenses(data ?? []);
+      setPaidGrades((data ?? []).map((l) => l.grade_id));
+    })();
   }, []);
 
-  useEffect(() => {
-    const fetchGrades = async () => {
-      const { data, error } = await supabase.from("grades").select("id, name, subjects(name)");
-      if (!error) setGradesWithSubject(data || []);
-    };
-    fetchGrades();
-  }, []);
-
-  const handleSignIn = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error) {
-      setIsAuthenticated(true);
-      setUserEmail(email);
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userEmail", email);
-    }
+  /* ──────────  Auth Action  ────────── */
+  const signIn = async () => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return toast.error(error.message);
+    toast.success("로그인 완료");
+    setIsAuthenticated(true);
+    setUserEmail(email);
+    localStorage.setItem("userEmail", email);
   };
 
-  const handleSignUp = async () => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (!error) {
-      alert("회원가입 성공! 이메일을 확인해주세요.");
-      setIsSignUp(false);
-    }
+  const signUp = async () => {
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) return toast.error(error.message);
+    toast.success("회원가입 메일을 확인하세요 ✉️");
+    setIsSignUp(false);
   };
 
-  const handleLogout = () => {
+  const logout = () => {
+    supabase.auth.signOut();
     setIsAuthenticated(false);
     setUserEmail("");
-    setSelectedGrade("");
+    setSelectedGradeId(null);
+    setSelectedGradeLabel("");
     localStorage.clear();
   };
 
+  /* ──────────  결제  ────────── */
   const handlePayment = async () => {
     if (!selectedGradeId) return;
     const stripe = await getStripe();
     const res = await fetch("/api/stripe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_email: userEmail, product_id: "price_1RYYlbFPDAhWFjqhRsr5ZJZk", grade_id: selectedGradeId, license_type: selectedGrade })
+      body: JSON.stringify({
+        user_email: userEmail,
+        grade_id: selectedGradeId,
+        product_id: "price_1RYYlbFPDAhWFjqhRsr5ZJZk",
+        license_type: selectedGradeLabel,
+      }),
     });
-    const { id: sessionId } = await res.json();
-    await stripe.redirectToCheckout({ sessionId });
+    const { id } = await res.json();
+    stripe.redirectToCheckout({ sessionId: id });
   };
 
+  /* ──────────  영상 그리기  ────────── */
   const renderVideos = () => {
-    const matchedVideos = videos.filter((v) => {
-      const grade = v.grades;
-      const label = `${grade?.subjects?.name || ""} ${grade?.name || ""}`;
-      return label === selectedGrade;
-    });
-    const selectedGradeId = matchedVideos[0]?.grade_id;
-    const isPaid = paidGrades.includes(selectedGradeId);
+    const list = videos.filter((v) => v.grade_id === selectedGradeId);
+    if (!list.length) return <p className="text-gray-400">영상이 없습니다.</p>;
+    const paid = paidGrades.includes(selectedGradeId!);
     return (
       <div className="space-y-6">
-        {isPaid ? (
-          matchedVideos.map((v) => (
-            <iframe key={v.id} width="560" height="315" src={getEmbedUrl(v.url)} title={v.title} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-          ))
-        ) : (
-          <>
-            {matchedVideos.map((v) => (
-              <div key={v.id} className="blur-sm pointer-events-none">
-                <iframe width="560" height="315" src={getEmbedUrl(v.url)} title={v.title} frameBorder="0"></iframe>
-              </div>
-            ))}
-            <Button onClick={handlePayment}>라이센스 구매 (\u20a9120,000 / 1년)</Button>
-          </>
+        {list.map((v) => (
+          <div key={v.id} className={paid ? "" : "blur-sm pointer-events-none"}>
+            <iframe
+              width="560"
+              height="315"
+              src={getEmbedUrl(v.url)}
+              title={v.title}
+              frameBorder={0}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        ))}
+        {!paid && (
+          <Button onClick={handlePayment}>라이센스 구매 (₩120,000 / 1년)</Button>
         )}
       </div>
     );
   };
 
+  /* ──────────  UI 렌더  ────────── */
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
-    <div className="absolute top-4 left-4 z-10">
-      <button onClick={() => setShowMenu(!showMenu)} className="text-white text-2xl">
+    <main className="flex min-h-screen flex-col items-center justify-center p-8 space-y-6">
+      {/* 메뉴 버튼 */}
+      <button
+        onClick={() => router.push("/")}
+        className="absolute top-4 left-4 text-white text-2xl"
+      >
         ☰
       </button>
-    
-      {showMenu && (
-        <div className="mt-2 bg-black shadow rounded p-4 space-y-2">
-          <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
-          {isAuthenticated && (
-            <>
-             <Button className="bg-primary text-white rounded-full px-4 py-2 w-full" onClick={goToAccountPage}>
-      계정
-    </Button>
-    
-              <Button
-                className="bg-primary text-white rounded-full px-4 py-2 w-full"
-                onClick={handleLogout}
-              >
-                로그아웃
-              </Button>
-            </>
-          )}
-        </div>
-      )}
-    </div>
-    
-    
-    
-    
-          {!isAuthenticated ? (
-            <Card className="w-full max-w-md">
-      <CardContent className="space-y-4">
-        <h1 className="text-xl font-bold text-center">
-          {isSignUp ? "회원가입" : "로그인"}
-        </h1>
-        <Input
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          placeholder="비밀번호"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {isSignUp ? (
-          <Button onClick={handleSignUp} className="w-full bg-primary text-white rounded-full">
-            회원가입
-          </Button>
-        ) : (
-          <Button onClick={handleSignIn} className="w-full bg-primary text-white rounded-full">
-            로그인
-          </Button>
-        )}
-        <div className="text-center text-sm">
-          {isSignUp ? (
-            <>
-              이미 계정이 있으신가요?{" "}
-              <button onClick={() => setIsSignUp(false)} className="underline">
-                로그인
-              </button>
-            </>
-          ) : (
-            <>
-              아직 회원이 아니신가요?{" "}
-              <button onClick={() => setIsSignUp(true)} className="underline">
+
+      {/* 로그인 / 회원가입 카드 */}
+      {!isAuthenticated ? (
+        <Card className="w-full max-w-md">
+          <CardContent className="space-y-4">
+            <h1 className="text-xl font-bold text-center">
+              {isSignUp ? "회원가입" : "로그인"}
+            </h1>
+            <Input placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              placeholder="비밀번호"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {isSignUp ? (
+              <Button className="w-full" onClick={signUp}>
                 회원가입
-              </button>
+              </Button>
+            ) : (
+              <Button className="w-full" onClick={signIn}>
+                로그인
+              </Button>
+            )}
+            <button
+              className="text-xs underline w-full text-center"
+              onClick={() => setIsSignUp(!isSignUp)}
+            >
+              {isSignUp ? "로그인 화면으로" : "회원가입하기"}
+            </button>
+          </CardContent>
+        </Card>
+      ) : (
+        /* ──────────  강의 선택 및 영상  ────────── */
+        <>
+          {!selectedGradeId ? (
+            <>
+              <h2 className="text-2xl font-bold">강의 선택</h2>
+              <div className="flex flex-wrap gap-4 justify-center">
+                {gradesWithSubject.map((g) => (
+                  <Button
+                    key={g.id}
+                    onClick={() => {
+                      setSelectedGradeId(g.id);
+                      const label = `${g.subjects?.[0]?.name ?? ""} ${g.name}`.trim();
+                      setSelectedGradeLabel(label);
+                    }}
+                  >
+                    {g.subjects?.[0]?.name} {g.name}
+                  </Button>
+                ))}
+              </div>
             </>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-    
           ) : (
-            <div className="space-y-8 text-center">
-    
-              <img
-      src="/banner.png"
-      alt="배너"
-      className="max-w-xl w-full mx-auto rounded-lg"
-    />
-    
-    
-    
-    
-              {!selectedGrade ? (
-                <>
-                  <h2 className="text-2xl font-bold">강의 선택</h2>
-    
-                  <div className="flex flex-wrap gap-4 justify-center">
-      {gradesWithSubject.map((grade) => (
-        <Button
-          key={grade.id}
-          className="bg-primary text-white rounded-full px-6 py-2"
-          onClick={() => {
-            const label = `${grade.subjects?.[0]?.name ?? ""} ${grade.name}`;
-            setSelectedGrade(label);
-            setSelectedGradeId(grade.id);
-            localStorage.setItem("selectedGrade", label);
-          }}
-        >
-          {grade.subjects?.[0]?.name ?? ""} {grade.name}
-        </Button>
-      ))}
-    </div>
-    
-    
-    
-    
-                </>
-              ) : (
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold">{selectedGrade} 영상 목록</h3>
-                  {renderVideos(
-                    
-                  )}
-                  <div className="space-x-2">
-                    <Button className="bg-primary text-white rounded-full px-6 py-2" onClick={() => setSelectedGrade("")}>학년 선택으로 돌아가기</Button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <div className="space-y-4 w-full max-w-2xl">{renderVideos()}</div>
           )}
-        </main>
+          <Button onClick={logout}>로그아웃</Button>
+        </>
+      )}
+    </main>
   );
 }
