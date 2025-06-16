@@ -74,8 +74,8 @@ export default function Home() {
   .select("id, name, subject(id, name)");
 
     const { data: videoData, error: videoError } = await supabase
-      .from("videos")
-      .select(`
+  .from("videos")
+  .select(`
     id,
     title,
     url,
@@ -83,12 +83,13 @@ export default function Home() {
     grades!videos_grade_id_fkey (
       id,
       name,
-      subjects (
+      subject (
         id,
         name
       )
     )
   `);
+
 
     if (videoError) {
       console.error("❌ videoData error", videoError);
