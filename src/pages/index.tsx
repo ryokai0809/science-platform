@@ -13,15 +13,16 @@ export type Subject = {
   name: string;
 };
 
-export type Grade = {
-  id: number;
-  name: string;
-  subject: Subject; // ❗단수형!
-};
-
 export type License = {
   grade_id: number;
   expires_at: string;
+};
+
+
+export type Grade = {
+  id: number;
+  name: string;
+  subjects: Subject[];  // 複数形で配列に
 };
 
 export type Video = {
@@ -29,12 +30,9 @@ export type Video = {
   title: string;
   url: string;
   grade_id: number;
-  grades: {
-    id: number;
-    name: string;
-    subject: Subject; // ✅ subject は単数
-  };
+  grades: Grade[];  // gradesも配列になる
 };
+
 
 const getEmbedUrl = (url: string) => {
   if (url.includes("/shorts/")) return url.replace("/shorts/", "/embed/");
@@ -59,6 +57,7 @@ export default function Home() {
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
   const [selectedGradeLabel, setSelectedGradeLabel] = useState<string>("");
   const [showMenu, setShowMenu] = useState(false);
+  
 
 
   const router = useRouter();
@@ -71,7 +70,8 @@ export default function Home() {
 
     const { data: gradeData } = await supabase
   .from("grades")
-  .select("id, name, subject(id, name)");
+  .select("id, name, subjects(id, name)")
+
 
     const { data: videoData, error: videoError } = await supabase
   .from("videos")
@@ -81,13 +81,13 @@ export default function Home() {
     url,
     grade_id,
     grades!videos_grade_id_fkey (
-      id,
-      name,
-      subject (
-        id,
-        name
-      )
-    )
+  id,
+  name,
+  subjects (
+    id,
+    name
+  )
+)
   `);
 
 
@@ -269,20 +269,24 @@ export default function Home() {
 
 
               <div className="flex flex-wrap gap-4 justify-center">
-                {gradesWithSubject.map((g) => (
-  <Button
-    key={g.id}
-    className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
-    onClick={() => {
-      const label = `${g.subject?.name ?? ""} ${g.name}`.trim();
-      setSelectedGradeId(g.id);
-      setSelectedGradeLabel(label);
-    }}
-  >
-    {`${g.subject?.name ?? ""} ${g.name}`}
-  </Button>
-))}
+                {gradesWithSubject.map((g) => {
+  // 🔧 subjectsが配列なので、先頭のnameを取得（なければ空文字）
+  const subjectName = g.subjects?.[0]?.name ?? "";
 
+  return (
+    <Button
+      key={g.id}
+      className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
+      onClick={() => {
+        const label = `${subjectName} ${g.name}`.trim();
+        setSelectedGradeId(g.id);
+        setSelectedGradeLabel(label);
+      }}
+    >
+      {`${subjectName} ${g.name}`}
+    </Button>
+  );
+})}
 
               </div>
             </>
