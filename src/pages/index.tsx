@@ -35,9 +35,10 @@ export type Video = {
   grades: {
     id: number;
     name: string;
-    subject: Subject;
+    subjects: Subject;
   };
 };
+
 
 
 
@@ -97,7 +98,7 @@ const { data: videoData, error: videoError } = await supabase
     grades:grades!videos_grade_id_fkey (
       id,
       name,
-      subject (
+      subjects (
         id,
         name
       )
