@@ -19,6 +19,7 @@ export type License = {
 };
 
 
+// ✅ 正しくはこうする
 export type Grade = {
   id: number;
   name: string;
@@ -30,7 +31,7 @@ export type Video = {
   title: string;
   url: string;
   grade_id: number;
-  grades: Grade[];  // gradesも配列になる
+  grades: Grade; // ← 配列ではない
 };
 
 
@@ -72,7 +73,8 @@ export default function Home() {
   .from("grades")
   .select("id, name, subject(id, name)");
 
-    const { data: videoData, error: videoError } = await supabase
+   // ✅ 単数形で書く
+const { data: videoData, error: videoError } = await supabase
   .from("videos")
   .select(`
     id,
@@ -80,14 +82,15 @@ export default function Home() {
     url,
     grade_id,
     grades!videos_grade_id_fkey (
-  id,
-  name,
-  subjects (
-    id,
-    name
-  )
-)
+      id,
+      name,
+      subject (
+        id,
+        name
+      )
+    )
   `);
+
 
 
     if (videoError) {
@@ -281,7 +284,7 @@ export default function Home() {
         setSelectedGradeLabel(label);
       }}
     >
-      {`${g.subject?.name ?? ""} ${g.name}`}
+     {`${g.subject?.name ?? ""} ${g.name}`}
     </Button>
   );
 })}
