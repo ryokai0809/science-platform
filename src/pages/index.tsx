@@ -32,9 +32,10 @@ export type Video = {
   grades: {
     id: number;
     name: string;
-    subjects: Subject[]; // ← subjectsは配列
-  }[];
+    subject: Subject; // ✅ subject は単数
+  };
 };
+
 const getEmbedUrl = (url: string) => {
   if (url.includes("/shorts/")) return url.replace("/shorts/", "/embed/");
   const m = url.match(/(?:v=|\/embed\/|\.be\/)([\w-]{11})/);
@@ -97,11 +98,9 @@ export default function Home() {
 
     setSubjects(subjectData ?? []);
     setGradesWithSubject((gradeData ?? []) as unknown as Grade[]);
-    setVideos((videoData ?? []) as Video[]);
+    setVideos((videoData ?? []) as unknown as Video[]);
   })();
 }, []);
- 
-
 
   useEffect(() => {
     (async () => {
