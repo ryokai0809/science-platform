@@ -32,8 +32,13 @@ export type Video = {
   title: string;
   url: string;
   grade_id: number;
-  grades: Grade; // ← 配列ではない
+  grades: {
+    id: number;
+    name: string;
+    subject: Subject;
+  };
 };
+
 
 
 const getEmbedUrl = (url: string) => {
@@ -82,7 +87,6 @@ export default function Home() {
   `);
 
 
-   // ✅ 単数形で書く
 const { data: videoData, error: videoError } = await supabase
   .from("videos")
   .select(`
@@ -90,7 +94,7 @@ const { data: videoData, error: videoError } = await supabase
     title,
     url,
     grade_id,
-    grades!videos_grade_id_fkey (
+    grades:grades!videos_grade_id_fkey (
       id,
       name,
       subject (
@@ -99,6 +103,7 @@ const { data: videoData, error: videoError } = await supabase
       )
     )
   `);
+
 
 
 
@@ -283,6 +288,7 @@ const { data: videoData, error: videoError } = await supabase
                 {gradesWithSubject.map((g) => (
   <Button
     key={g.id}
+    className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
     onClick={() => {
       const label = `${g.subjects?.name ?? ""} ${g.name}`.trim();
       setSelectedGradeId(g.id);
