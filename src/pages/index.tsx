@@ -22,7 +22,7 @@ export type License = {
 export type Grade = {
   id: number;
   name: string;
-  subjects: Subject[];  // 複数形で配列に
+  subject: Subject;
 };
 
 export type Video = {
@@ -70,8 +70,7 @@ export default function Home() {
 
     const { data: gradeData } = await supabase
   .from("grades")
-  .select("id, name, subjects(id, name)")
-
+  .select("id, name, subject(id, name)");
 
     const { data: videoData, error: videoError } = await supabase
   .from("videos")
@@ -271,19 +270,18 @@ export default function Home() {
               <div className="flex flex-wrap gap-4 justify-center">
                 {gradesWithSubject.map((g) => {
   // 🔧 subjectsが配列なので、先頭のnameを取得（なければ空文字）
-  const subjectName = g.subjects?.[0]?.name ?? "";
 
   return (
     <Button
       key={g.id}
       className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
       onClick={() => {
-        const label = `${subjectName} ${g.name}`.trim();
+        const label = `${g.subject?.name ?? ""} ${g.name}`.trim();
         setSelectedGradeId(g.id);
         setSelectedGradeLabel(label);
       }}
     >
-      {`${subjectName} ${g.name}`}
+      {`${g.subject?.name ?? ""} ${g.name}`}
     </Button>
   );
 })}
