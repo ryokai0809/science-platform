@@ -223,6 +223,7 @@ const { data: videoData, error: videoError } = await supabase
        {showMenu && (
   <div className="mt-2 bg-black shadow rounded p-4 space-y-4">
     <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
+    <div className="flex flex-col space-y-2">
     <Button
       className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
       onClick={() => router.push("/account")} // ← 여기서 계정 페이지로 이동
@@ -235,6 +236,7 @@ const { data: videoData, error: videoError } = await supabase
     >
       로그아웃
     </Button>
+        </div>
   </div>
 )}
 
