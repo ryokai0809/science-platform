@@ -47,12 +47,14 @@ export default function HistoryPage() {
       ) : (
 <table className="w-full text-sm text-left border border-gray-600 text-white">
   <thead className="bg-gray-800 text-white">
-    <tr>
-      <th className="px-4 py-3 border-b border-gray-700">라이선스 종류</th>
-      <th className="px-4 py-3 border-b border-gray-700">결제일</th>
-      <th className="px-4 py-3 border-b border-gray-700">만료일</th>
-    </tr>
-  </thead>
+  <tr>
+    <th className="px-4 py-3 border-b border-gray-700">라이선스 종류</th>
+    <th className="px-4 py-3 border-b border-gray-700">결제일</th>
+    <th className="px-4 py-3 border-b border-gray-700">만료일</th>
+    <th className="px-4 py-3 border-b border-gray-700">상태</th>
+  </tr>
+</thead>
+
   <tbody className="divide-y divide-gray-700">
   {history.map((item, idx) => {
     const isValid = new Date(item.expires_at) >= new Date();
