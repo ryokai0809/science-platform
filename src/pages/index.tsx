@@ -221,7 +221,7 @@ const { data: videoData, error: videoError } = await supabase
         </button>
 
        {showMenu && (
-  <div className="mt-2 bg-black shadow rounded p-4 space-y-2">
+  <div className="mt-2 bg-black shadow rounded p-4 space-y-4">
     <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
     <Button
       className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
