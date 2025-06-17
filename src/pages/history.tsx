@@ -57,7 +57,12 @@ export default function HistoryPage() {
 
   <tbody className="divide-y divide-gray-700">
   {history.map((item, idx) => {
-    const isValid = new Date(item.expires_at) >= new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expireDate = new Date(item.expires_at);
+    expireDate.setHours(0, 0, 0, 0);
+    const isValid = expireDate >= today;
+
     return (
       <tr key={idx} className="hover:bg-gray-700">
         <td className="px-4 py-2">{item.license_type}</td>
@@ -65,7 +70,7 @@ export default function HistoryPage() {
           {new Date(item.purchased_at).toLocaleDateString()}
         </td>
         <td className="px-4 py-2">
-          {new Date(item.expires_at).toLocaleDateString()}
+          {expireDate.toLocaleDateString()}
         </td>
         <td className="px-4 py-2 font-semibold">
           {isValid ? (
@@ -78,6 +83,7 @@ export default function HistoryPage() {
     );
   })}
 </tbody>
+
 
 </table>
 
