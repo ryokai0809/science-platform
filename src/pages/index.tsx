@@ -183,33 +183,57 @@ const { data: videoData, error: videoError } = await supabase
     stripe.redirectToCheckout({ sessionId: id });
   };
 
-  const renderVideos = () => {
-    const list = videos.filter((v) => v.grade_id === selectedGradeId);
-    if (!list.length) return <p className="text-gray-400">영상이 없습니다.</p>;
-    const paid = paidGrades.includes(selectedGradeId!);
-    return (
-      <div className="space-y-6">
-        {list.map((v) => (
-          <div key={v.id} className={paid ? "" : "blur-sm pointer-events-none"}>
-            <iframe
-              width="560"
-              height="315"
-              src={getEmbedUrl(v.url)}
-              title={v.title}
-              frameBorder={0}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        ))}
-        {!paid && (
-          <Button className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important" onClick={handlePayment}>
-            이용권 구매 ($70 / 1년)
-          </Button>
-        )}
-      </div>
-    );
-  };
+const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
+
+const renderVideos = () => {
+  const list = videos.filter((v) => v.grade_id === selectedGradeId);
+  if (!list.length) return <p className="text-gray-400">영상이 없습니다.</p>;
+  const paid = paidGrades.includes(selectedGradeId!);
+
+  return (
+    <div className="space-y-4">
+      {list.map((v) => (
+        <div key={v.id} className={paid ? "" : "blur-sm pointer-events-none"}>
+          {/* 제목 클릭 시 토글 */}
+          <button
+            onClick={() =>
+              setSelectedVideoId(selectedVideoId === v.id ? null : v.id)
+            }
+            className="block w-full text-left font-bold text-white bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded transition"
+          >
+            {v.title}
+          </button>
+
+          {/* 선택된 경우에만 iframe 렌더링 */}
+          {selectedVideoId === v.id && (
+            <div className="mt-2">
+              <iframe
+                width="560"
+                height="315"
+                src={getEmbedUrl(v.url)}
+                title={v.title}
+                frameBorder={0}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full rounded-lg"
+              />
+            </div>
+          )}
+        </div>
+      ))}
+
+      {!paid && (
+        <Button
+          className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
+          onClick={handlePayment}
+        >
+          이용권 구매 ($70 / 1년)
+        </Button>
+      )}
+    </div>
+  );
+};
+
 
   return (
     <>
