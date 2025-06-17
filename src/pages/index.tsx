@@ -322,9 +322,8 @@ const { data: videoData, error: videoError } = await supabase
           </div>
         </>
       )}
-    </main>
 
-    <div className="w-full flex flex-col items-center mt-2">
+      <div className="w-full flex flex-col items-center mt-2">
   <h3 className="text-xl font-bold mb-4">샘플 영상</h3>
   <div className="w-full max-w-xl aspect-video">
     <iframe
@@ -336,6 +335,8 @@ const { data: videoData, error: videoError } = await supabase
     />
   </div>
 </div>
+    </main>
+
 
 
 <footer className="w-full bg-black text-white text-sm py-6 px-4 mt-12">
