@@ -211,6 +211,7 @@ const { data: videoData, error: videoError } = await supabase
   };
 
   return (
+    <>
     <main className="flex min-h-screen flex-col items-center justify-center p-8 space-y-6">
       <div className="absolute top-4 left-4 z-10">
         <button
@@ -321,5 +322,44 @@ const { data: videoData, error: videoError } = await supabase
         </>
       )}
     </main>
+
+<footer className="w-full bg-black text-white text-sm py-6 px-4 mt-12">
+  <div className="max-w-4xl mx-auto space-y-4 text-center">
+    <p>© science dream Allright reserved.</p>
+    <p>
+      Email:{" "}
+      <a href="mailto:sciencegive@gmail.com" className="underline">
+        sciencegive@gmail.com
+      </a>
+    </p>
+    <div className="flex justify-center items-center space-x-4 mt-2 text-blue-400">
+      <a
+        href="https://smartstore.naver.com/sciencegive"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        과학드림 스토어
+      </a>
+      <a
+        href="https://instagram.com/sciencegive"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        인스타그램
+      </a>
+      <a
+        href="https://www.youtube.com/channel/UCIk1-yPCTnFuzfgu4gyfWqw/join"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        후원하기
+      </a>
+    </div>
+  </div>
+</footer>
+
+
+
+    </>
   );
 }
