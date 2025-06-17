@@ -204,7 +204,7 @@ const { data: videoData, error: videoError } = await supabase
         ))}
         {!paid && (
           <Button className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important" onClick={handlePayment}>
-            라이센스 구매 ($70 / 1년)
+            이용권 구매 ($70 / 1년)
           </Button>
         )}
       </div>
@@ -322,7 +322,7 @@ const { data: videoData, error: videoError } = await supabase
           </div>
         </>
       )}
-
+{!selectedGradeId && (
       <div className="w-full flex flex-col items-center mt-2">
   <h3 className="text-xl font-bold mb-4">샘플 영상</h3>
   <div className="w-full max-w-xl aspect-video">
@@ -334,7 +334,7 @@ const { data: videoData, error: videoError } = await supabase
       className="w-full h-full rounded-lg shadow-lg"
     />
   </div>
-</div>
+</div>)}
     </main>
 
 
