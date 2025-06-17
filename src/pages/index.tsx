@@ -43,11 +43,20 @@ export type Video = {
 
 
 
-const getEmbedUrl = (url: string) => {
-  if (url.includes("/shorts/")) return url.replace("/shorts/", "/embed/");
-  const m = url.match(/(?:v=|\/embed\/|\.be\/)([\w-]{11})/);
-  return m ? `https://www.youtube.com/embed/${m[1]}` : url;
+const getEmbedUrl = (url: string): string => {
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  }
+
+  const youtubeMatch = url.match(/(?:v=|\/embed\/|\.be\/)([\w-]{11})/);
+  if (youtubeMatch) {
+    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+  }
+
+  return url; // fallback
 };
+
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
