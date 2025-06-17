@@ -54,14 +54,29 @@ export default function HistoryPage() {
     </tr>
   </thead>
   <tbody className="divide-y divide-gray-700">
-    {history.map((item, idx) => (
+  {history.map((item, idx) => {
+    const isValid = new Date(item.expires_at) >= new Date();
+    return (
       <tr key={idx} className="hover:bg-gray-700">
         <td className="px-4 py-2">{item.license_type}</td>
-        <td className="px-4 py-2">{new Date(item.purchased_at).toLocaleDateString()}</td>
-        <td className="px-4 py-2">{new Date(item.expires_at).toLocaleDateString()}</td>
+        <td className="px-4 py-2">
+          {new Date(item.purchased_at).toLocaleDateString()}
+        </td>
+        <td className="px-4 py-2">
+          {new Date(item.expires_at).toLocaleDateString()}
+        </td>
+        <td className="px-4 py-2 font-semibold">
+          {isValid ? (
+            <span className="text-green-400">사용 가능</span>
+          ) : (
+            <span className="text-red-400">사용 불가</span>
+          )}
+        </td>
       </tr>
-    ))}
-  </tbody>
+    );
+  })}
+</tbody>
+
 </table>
 
       )}
