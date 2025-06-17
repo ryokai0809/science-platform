@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 
@@ -75,8 +75,8 @@ export default function Home() {
   const [selectedGradeId, setSelectedGradeId] = useState<number | null>(null);
   const [selectedGradeLabel, setSelectedGradeLabel] = useState<string>("");
   const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   
-
 
   const router = useRouter();
 
@@ -149,6 +149,24 @@ const { data: videoData, error: videoError } = await supabase
       setPaidGrades((data ?? []).map((l) => l.grade_id));
     })();
   }, []);
+
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      setShowMenu(false);
+    }
+  };
+
+  if (showMenu) {
+    document.addEventListener("mousedown", handleClickOutside);
+  } else {
+    document.removeEventListener("mousedown", handleClickOutside);
+  }
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [showMenu]);
 
   const signIn = async () => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -256,24 +274,25 @@ const renderVideos = () => {
         </button>
 
        {showMenu && (
-  <div className="mt-2 bg-black shadow rounded p-4 space-y-4">
+  <div ref={menuRef} className="mt-2 bg-black shadow rounded p-4 space-y-4">
     <div className="text-white text-sm">{userEmail || "비로그인 상태"}</div>
     <div className="flex flex-col space-y-2">
-    <Button
-      className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
-      onClick={() => router.push("/account")} // ← 여기서 계정 페이지로 이동
-    >
-      계정
-    </Button>
-    <Button
-      className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
-      onClick={logout}
-    >
-      로그아웃
-    </Button>
-        </div>
+      <Button
+        className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
+        onClick={() => router.push("/account")}
+      >
+        계정
+      </Button>
+      <Button
+        className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
+        onClick={logout}
+      >
+        로그아웃
+      </Button>
+    </div>
   </div>
 )}
+
 
       </div>
 
