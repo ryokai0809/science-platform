@@ -329,54 +329,59 @@ const { data: videoData, error: videoError } = await supabase
     <p>© science dream Allright reserved.</p>
     <p>
       Email:{" "}
-      <a href="mailto:sciencegive@gmail.com" className="underline">
+      <a href="mailto:sciencegive@gmail.com" className="underline hover:text-[#EA6137] transition-colors">
         sciencegive@gmail.com
       </a>
     </p>
 
-    <div className="flex justify-center gap-6 mt-4">
+    <div className="flex justify-center gap-8 mt-6">
+      {/* Youtube */}
+      <a
+        href="https://www.youtube.com/@ScienceDream"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex flex-col items-center text-[#EA6137] hover:text-[#d4542e] transition-transform transform hover:scale-110"
+      >
+        <Youtube size={24} />
+        <span className="text-xs mt-1">유튜브</span>
+      </a>
+
+      {/* Store */}
       <a
         href="https://smartstore.naver.com/sciencegive"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex flex-col items-center text-blue-400 hover:text-blue-300 transition"
+        className="flex flex-col items-center text-[#EA6137] hover:text-[#d4542e] transition-transform transform hover:scale-110"
       >
         <ShoppingCart size={24} />
         <span className="text-xs mt-1">스토어</span>
       </a>
 
+      {/* Instagram */}
       <a
         href="https://instagram.com/sciencegive"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex flex-col items-center text-blue-400 hover:text-blue-300 transition"
+        className="flex flex-col items-center text-[#EA6137] hover:text-[#d4542e] transition-transform transform hover:scale-110"
       >
         <Instagram size={24} />
         <span className="text-xs mt-1">인스타그램</span>
       </a>
 
+      {/* 후원 */}
       <a
         href="https://www.youtube.com/channel/UCIk1-yPCTnFuzfgu4gyfWqw/join"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex flex-col items-center text-blue-400 hover:text-blue-300 transition"
+        className="flex flex-col items-center text-[#EA6137] hover:text-[#d4542e] transition-transform transform hover:scale-110"
       >
         <Heart size={24} />
         <span className="text-xs mt-1">후원하기</span>
       </a>
-
-      <a
-        href="https://www.youtube.com/@ScienceDream"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex flex-col items-center text-blue-400 hover:text-blue-300 transition"
-      >
-        <Youtube size={24} />
-        <span className="text-xs mt-1">유튜브</span>
-      </a>
     </div>
   </div>
 </footer>
+
 
 
 
