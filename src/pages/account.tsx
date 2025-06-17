@@ -26,7 +26,7 @@ export default function AccountPage() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-white text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen text-white text-center space-y-4">
       <h1 className="text-2xl font-bold mb-4">계정 정보</h1>
 
       <Button 
