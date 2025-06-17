@@ -324,13 +324,13 @@ const { data: videoData, error: videoError } = await supabase
       )}
     </main>
 
-    <div className="w-full max-w-2xl mt-12">
+    <div className="w-full max-w-2xl mt-6">
   <h3 className="text-xl font-bold text-center mb-4">샘플 영상</h3>
   <div className="flex justify-center">
     <iframe
       width="560"
       height="315"
-      src="https://www.youtube.com/embed/샘플영상ID" // 예: dQw4w9WgXcQ
+      src="https://www.youtube.com/embed/Z5mVj31NR7M" // 예: dQw4w9WgXcQ
       title="샘플 영상"
       frameBorder={0}
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
