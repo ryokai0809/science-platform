@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/utils/supabaseClient";
 import getStripe from "@/utils/stripe";
+import { Youtube, Instagram, ShoppingCart, Heart } from "lucide-react";
 
 export type Subject = {
   id: number;
@@ -332,31 +333,51 @@ const { data: videoData, error: videoError } = await supabase
         sciencegive@gmail.com
       </a>
     </p>
-    <div className="flex justify-center items-center space-x-4 mt-2 text-blue-400">
+
+    <div className="flex justify-center gap-6 mt-4">
       <a
         href="https://smartstore.naver.com/sciencegive"
         target="_blank"
         rel="noopener noreferrer"
+        className="flex flex-col items-center text-blue-400 hover:text-blue-300 transition"
       >
-        과학드림 스토어
+        <ShoppingCart size={24} />
+        <span className="text-xs mt-1">스토어</span>
       </a>
+
       <a
         href="https://instagram.com/sciencegive"
         target="_blank"
         rel="noopener noreferrer"
+        className="flex flex-col items-center text-blue-400 hover:text-blue-300 transition"
       >
-        인스타그램
+        <Instagram size={24} />
+        <span className="text-xs mt-1">인스타그램</span>
       </a>
+
       <a
         href="https://www.youtube.com/channel/UCIk1-yPCTnFuzfgu4gyfWqw/join"
         target="_blank"
         rel="noopener noreferrer"
+        className="flex flex-col items-center text-blue-400 hover:text-blue-300 transition"
       >
-        후원하기
+        <Heart size={24} />
+        <span className="text-xs mt-1">후원하기</span>
+      </a>
+
+      <a
+        href="https://www.youtube.com/@ScienceDream"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex flex-col items-center text-blue-400 hover:text-blue-300 transition"
+      >
+        <Youtube size={24} />
+        <span className="text-xs mt-1">유튜브</span>
       </a>
     </div>
   </div>
 </footer>
+
 
 
 
