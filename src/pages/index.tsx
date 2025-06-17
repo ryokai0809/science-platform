@@ -212,7 +212,7 @@ const { data: videoData, error: videoError } = await supabase
 
   return (
     <>
-    <main className="flex min-h-screen flex-col items-center justify-center p-8 space-y-6">
+    <main className="flex min-h-[calc(100vh-150px)] flex-col items-center justify-center p-8 space-y-6">
       <div className="absolute top-4 left-4 z-10">
         <button
           onClick={() => setShowMenu(!showMenu)}
