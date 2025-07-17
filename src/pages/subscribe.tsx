@@ -27,6 +27,8 @@ export default function SubscribePage() {
       return;
     }
 
+    console.log("📤 user.id:", user.id);
+
     const res = await fetch("/api/subscribe-status", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
