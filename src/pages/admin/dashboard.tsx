@@ -5,6 +5,8 @@ import { supabase } from "../../utils/supabaseClient";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import type { Subject } from "@/types/subject";
+import { useTranslation } from "next-i18next";
+import { i18n } from "next-i18next"; // 현재 언어 정보 가져오기
 
 type Grade = {
   id: number;
@@ -14,9 +16,25 @@ type Grade = {
 };
 
 export default function AdminDashboard() {
+  const { i18n } = useTranslation();  // ✅ 최상단에서 호출
+
+  useEffect(() => {
+  (async () => {
+    const currentLocale = i18n.language || "ko";
+
+    const { data: videos } = await supabase
+      .from("videos")
+      .select("*")
+      .eq("locale", currentLocale); // 👈 필터링
+
+    setVideos(videos || []);
+  })();
+}, [i18n.language]);
+
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [videos, setVideos] = useState<any[]>([]);
+  const [locale, setLocale] = useState("ja"); // 初期値は "ja" だが変更可
 
   const [newSubject, setNewSubject] = useState("");
   const [newGrade, setNewGrade] = useState({ name: "", subjectId: "" });
@@ -48,10 +66,14 @@ export default function AdminDashboard() {
   }
 
   async function addSubject() {
-    await supabase.from("subjects").insert({ name: newSubject }).select();
-    setNewSubject("");
-    fetchData();
-  }
+  await supabase.from("subjects").insert({
+    name: newSubject,
+    locale: locale, // 🌐 選択されたlocaleを一緒に保存
+  });
+  setNewSubject("");
+  fetchData();
+}
+
 
   async function addGrade() {
     await supabase.from("grades").insert({
@@ -62,16 +84,56 @@ export default function AdminDashboard() {
     fetchData();
   }
 
+  // async function addVideo() {
+  //   const currentLocale = i18n.language || "ko";
+  //   await supabase.from("videos").insert({
+  //     title: newVideo.title,
+  //     url: newVideo.url,
+  //     description: newVideo.description,
+  //     grade_id: parseInt(newVideo.gradeId),
+  //     locale,
+  //   });
+  //   setNewVideo({ title: "", url: "", description: "", gradeId: "" });
+  //   fetchData();
+  // }
   async function addVideo() {
-    await supabase.from("videos").insert({
-      title: newVideo.title,
-      url: newVideo.url,
-      description: newVideo.description,
-      grade_id: parseInt(newVideo.gradeId),
-    });
-    setNewVideo({ title: "", url: "", description: "", gradeId: "" });
-    fetchData();
+  // ① grade_id 로 subject_id 조회
+  const { data: selectedGrade, error } = await supabase
+    .from("grades")
+    .select("subject_id")
+    .eq("id", parseInt(newVideo.gradeId))
+    .single();
+
+  if (error || !selectedGrade) {
+    console.error("학년 로딩 실패:", error);
+    return;
   }
+
+  // ② subject_id 로 locale 조회
+  const { data: subject, error: subjectError } = await supabase
+    .from("subjects")
+    .select("locale")
+    .eq("id", selectedGrade.subject_id)
+    .single();
+
+  if (subjectError || !subject) {
+    console.error("과목 로딩 실패:", subjectError);
+    return;
+  }
+
+  // ③ locale 은 subject 테이블에서 자동 적용
+  await supabase.from("videos").insert({
+    title: newVideo.title,
+    url: newVideo.url,
+    description: newVideo.description,
+    grade_id: parseInt(newVideo.gradeId),
+    locale: subject.locale, // ✅ 과목 기준으로 locale 지정
+  });
+
+  setNewVideo({ title: "", url: "", description: "", gradeId: "" });
+  fetchData();
+}
+
 
   async function deleteSubject(id: number) {
     const { data: grades, error: gradeFetchError } = await supabase
@@ -152,8 +214,27 @@ export default function AdminDashboard() {
       {/* 과목 추가 */}
       <div className="space-y-2">
         <h2 className="text-xl">과목 추가</h2>
+        <select
+  value={locale}
+  onChange={(e) => setLocale(e.target.value)}
+  className="border rounded px-2 py-1 mb-2"
+>
+  <option value="ko">한국어</option>
+  <option value="ja">日本語</option>
+</select>
         <Input value={newSubject} onChange={(e) => setNewSubject(e.target.value)} />
-        <Button onClick={addSubject}>과목 추가</Button>
+        <Button
+  onClick={addSubject}
+  disabled={!newSubject.trim()}
+  className={`${
+    newSubject.trim()
+      ? "bg-[#EA6137] hover:bg-[#d4542e]"
+      : "bg-gray-400 cursor-not-allowed"
+  } text-white px-6 py-2 rounded-full`}
+>
+  과목 추가
+</Button>
+
       </div>
 
       {/* 학년 추가 */}
@@ -170,12 +251,24 @@ export default function AdminDashboard() {
             </option>
           ))}
         </select>
+
         <Input
           placeholder="예: 1학년"
           value={newGrade.name}
           onChange={(e) => setNewGrade({ ...newGrade, name: e.target.value })}
         />
-        <Button onClick={addGrade}>학년 추가</Button>
+        <Button
+  onClick={addGrade}
+  disabled={!newGrade.name.trim() || !newGrade.subjectId}
+  className={`${
+    newGrade.name.trim() && newGrade.subjectId
+      ? "bg-[#EA6137] hover:bg-[#d4542e]"
+      : "bg-gray-400 cursor-not-allowed"
+  } text-white px-6 py-2 rounded-full`}
+>
+  학년 추가
+</Button>
+
       </div>
 
       {/* 동영상 추가 */}
@@ -207,7 +300,20 @@ export default function AdminDashboard() {
           value={newVideo.description}
           onChange={(e) => setNewVideo({ ...newVideo, description: e.target.value })}
         />
-        <Button onClick={addVideo}>동영상 추가</Button>
+        <Button
+  onClick={addVideo}
+  disabled={
+    !newVideo.gradeId || !newVideo.title.trim() || !newVideo.url.trim()
+  }
+  className={`${
+    newVideo.gradeId && newVideo.title.trim() && newVideo.url.trim()
+      ? "bg-[#EA6137] hover:bg-[#d4542e]"
+      : "bg-gray-400 cursor-not-allowed"
+  } text-white px-6 py-2 rounded-full`}
+>
+  동영상 추가
+</Button>
+
       </div>
 
       {/* 과목 목록 */}

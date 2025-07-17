@@ -1,54 +1,65 @@
-// pages/success.tsx
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "../utils/supabaseClient";
 import { Button } from "../components/ui/button";
+import { useTranslation } from "next-i18next";
+import { GetStaticProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function SuccessPage() {
   const router = useRouter();
-  const { grade_id } = router.query; 
+  const { i18n, t } = useTranslation("common");
 
   useEffect(() => {
-    const registerLicense = async () => {
-      const email = localStorage.getItem("userEmail"); // 저장된 이메일
-      const licenseType = localStorage.getItem("selectedGrade"); // 예: "중학교 1학년"
+    const notifyServer = async () => {
+      const email = localStorage.getItem("userEmail");
+      const jukuId = localStorage.getItem("jukuId");
+      const gradeId = localStorage.getItem("selectedGradeId");
 
-      if (!email || !licenseType) return;
+      if (!email) {
+        console.error("❌ Email が未取得");
+        return;
+      }
 
-      const now = new Date();
-      const oneYearLater = new Date();
-      oneYearLater.setFullYear(now.getFullYear() + 1);
+      const res = await fetch("/api/subscribe-complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          jukuId,
+          gradeId,
+        }),
+      });
 
-      const { data, error } = await supabase.from("licenses").insert([
-        {
-          user_email: email,
-          license_type: licenseType,
-          purchased_at: now.toISOString(),
-          expires_at: oneYearLater.toISOString(),
-        },
-      ]);
-
-      if (error) {
-        console.error("Supabase 저장 실패:", error.message);
+      if (!res.ok) {
+        const error = await res.json();
+        console.error("❌ subscribe-complete API error:", error);
       } else {
-        console.log("라이선스 등록 성공:", data);
+        console.log("✅ サーバーに決済完了通知を送信しました");
       }
     };
 
-    registerLicense();
+    notifyServer();
   }, []);
 
   return (
     <div className="text-center mt-16 text-white">
-      <h1 className="text-2xl font-bold mb-4">결제가 완료되었습니다!</h1>
-      <p>이제 영상을 자유롭게 시청하실 수 있습니다.</p>
+      <h1 className="text-2xl font-bold mb-4">{t("paymentCompleted")}</h1>
+      <p>{t("youCanWatchFreely")}</p>
       <Button
-  className="mt-6 bg-primary text-white rounded-full px-6 py-2"
-  onClick={() => router.push("/")}
->
-  학년 선택으로 돌아가기
-</Button>
-
+        className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"
+        onClick={() => router.push("/")}
+      >
+        {t("backToGradeSelection")}
+      </Button>
     </div>
   );
 }
+
+// ✅ 翻訳データを読み込む
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "ja", ["common"])),
+    },
+  };
+};
