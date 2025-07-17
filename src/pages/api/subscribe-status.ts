@@ -45,17 +45,16 @@ import { supabaseAdmin } from "@/utils/supabaseServerClient";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "GET") {
+  if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const user_id = req.query.user_id as string;
+  const { user_id } = req.body;
 
   if (!user_id) {
     return res.status(400).json({ error: "Missing user_id" });
   }
 
-  // 有効なライセンスを確認
   const { data: licenses, error: licenseError } = await supabaseAdmin
     .from("licenses")
     .select("id")
