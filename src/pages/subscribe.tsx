@@ -11,38 +11,39 @@ export default function SubscribePage() {
   const locale = i18n.language;
 
   useEffect(() => {
-    (async () => {
-      if (locale !== "ja") {
-        setIsSubscribed(false);
-        return;
-      }
+  (async () => {
+    if (locale !== "ja") {
+      setIsSubscribed(false);
+      return;
+    }
 
-      const { data: authData } = await supabase.auth.getUser();
-      const user = authData?.user;
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user;
 
-      if (!user) {
-  alert(t("loginRequired"));
-  setIsSubscribed(false);
-  router.push("/");
-  return;
-}
+    if (!user) {
+      alert(t("loginRequired"));
+      setIsSubscribed(false);
+      router.push("/");
+      return;
+    }
 
+    const res = await fetch("/api/subscribe-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: user.id }),
+    });
 
-      const res = await fetch(`/api/subscribe-status?user_id=${user.id}`);
+    if (!res.ok) {
+      console.error("❌ ユーザー登録API失敗", await res.text());
+      setIsSubscribed(false);
+      return;
+    }
 
-if (!res.ok) {
-  console.error("❌ ユーザー登録API失敗", await res.text());
-  setIsSubscribed(false);
-  return;
-}
+    const json = await res.json();
+    setIsSubscribed(Boolean(json.is_subscribed));
+  })();
+}, [locale]);
 
-const json = await res.json();
-setIsSubscribed(Boolean(json.is_subscribed));
-
-
-
-    })();
-  }, [locale]);
 
   if (isSubscribed === null) {
     return <p className="text-center mt-12">{t("loading")}</p>;
