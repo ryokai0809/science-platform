@@ -16,7 +16,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const sig = req.headers["stripe-signature"];
+  console.log("Stripe Signature:", sig);
   const buf = await buffer(req);
+  console.log("=== Raw body ===");
+console.log(buf.toString());
 
   let event: Stripe.Event;
 
