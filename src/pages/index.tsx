@@ -125,7 +125,10 @@ setUserId(u);
     if (!selectedGradeId) return;
     const stripe = await getStripe();
     const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) return;
+    if (userData.user) {
+  localStorage.setItem("userId", userData.user.id);
+}
+        if (!userData.user) return;
     const userId = userData.user.id;
     const jukuId = userData.user.user_metadata?.juku_id || null;
 
