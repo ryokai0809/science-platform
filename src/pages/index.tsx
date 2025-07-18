@@ -82,8 +82,16 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       const u = localStorage.getItem("userId");
-if (!u) return;
-setUserId(u);
+if (u) {
+  setUserId(u);
+} else {
+  // セッションから復元
+  const { data } = await supabase.auth.getUser();
+  if (data?.user) {
+    setUserId(data.user.id);
+    localStorage.setItem("userId", data.user.id);
+  }
+}
 
       if (locale === "ja") {
         const res = await fetch("/api/subscribe-status", {
