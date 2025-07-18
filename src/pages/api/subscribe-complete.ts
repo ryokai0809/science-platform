@@ -118,7 +118,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .insert([
       {
         user_id: userId,
-        user_email: email,
         juku_id: jukuId ?? null,
         grade_id: gradeId ?? null,
         license_type: licenseType ?? "default",
