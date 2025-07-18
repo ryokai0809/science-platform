@@ -287,7 +287,10 @@ if (u) {
             onClick={() => setSelectedGradeId(null)}
             >{t("lectureSelect")}</Button>
              </div>
-             {!selectedGradeId && (
+          </div>
+        )}
+        {/* サンプル動画の表示 */}
+{!selectedGradeId && (
   <div className="w-full flex flex-col items-center mt-2">
     <h3 className="text-xl font-bold mb-4">{t("sampleVideo")}</h3>
     <div className="w-full max-w-xl aspect-video">
@@ -302,8 +305,6 @@ if (u) {
   </div>
 )}
 
-          </div>
-        )}
       </main>
 
       <footer className="w-full bg-black text-white text-sm py-6 px-4 mt-12">
