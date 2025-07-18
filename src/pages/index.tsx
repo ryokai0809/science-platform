@@ -56,7 +56,7 @@ export default function Home() {
   const { t, i18n } = useTranslation('common');
   const locale = i18n.language;
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState("");
+  const [userId, setUserId] = useState("");
   const contactEmail = locale === "ja" ? "sciencedreamjp@gmail.com" : "sciencegive@gmail.com";
 
   useEffect(() => {
@@ -81,12 +81,17 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const u = localStorage.getItem("userEmail");
-      if (!u) return;
-      setUserEmail(u);
+      const u = localStorage.getItem("userId");
+if (!u) return;
+setUserId(u);
 
       if (locale === "ja") {
-        const res = await fetch("/api/subscribe-status", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: u }) });
+        const res = await fetch("/api/subscribe-status", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ user_id: u }),
+});
+
         if (res.ok) {
           const json = await res.json();
           setPaidGrades(json.is_subscribed ? [999] : []);
@@ -109,7 +114,7 @@ export default function Home() {
 
   const logout = () => {
     supabase.auth.signOut();
-    setUserEmail("");
+    setUserId("");
     setSelectedGradeId(null);
     setSelectedGradeLabel("");
     localStorage.clear();
@@ -128,11 +133,10 @@ export default function Home() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        user_email: userEmail,
+        user_id: userId,
         grade_id: selectedGradeId,
         product_id: "price_1RYYlbFPDAhWFjqhRsr5ZJZk",
         license_type: selectedGradeLabel,
-        user_id: userId,
         juku_id: jukuId,
       }),
     });
@@ -208,10 +212,10 @@ export default function Home() {
          {showMenu && (
   <div ref={menuRef} className="mt-2 bg-black shadow rounded p-4 space-y-4">
     <div className="text-white text-sm">
-      {userEmail || t("notLoggedIn")}
+      {userId ? `UserID: ${userId}` : t("notLoggedIn")}
     </div>
     <div className="flex flex-col space-y-2">
-      {userEmail ? (
+      {userId ? (
         <>
           <Button
             className="bg-[#EA6137] hover:bg-[#d4542e] text-white px-6 py-2 rounded-full !important"

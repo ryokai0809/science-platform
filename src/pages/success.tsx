@@ -16,7 +16,7 @@ export default function SuccessPage() {
       const gradeId = localStorage.getItem("selectedGradeId");
 
       if (!userId) {
-        console.error("❌ Email が未取得");
+        console.error("❌ userId が未取得");
         return;
       }
 
