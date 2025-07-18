@@ -11,11 +11,11 @@ export default function SuccessPage() {
 
   useEffect(() => {
     const notifyServer = async () => {
-      const email = localStorage.getItem("userEmail");
+      const userId = localStorage.getItem("userId");  // 
       const jukuId = localStorage.getItem("jukuId");
       const gradeId = localStorage.getItem("selectedGradeId");
 
-      if (!email) {
+      if (!userId) {
         console.error("❌ Email が未取得");
         return;
       }
@@ -24,7 +24,7 @@ export default function SuccessPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
+          user_id: userId,
           jukuId,
           gradeId,
         }),
