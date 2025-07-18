@@ -72,6 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .from("licenses")
         .upsert({
           user_id,
+          grade_id: 999,
           stripe_customer_id: stripeCustomerId,
           is_canceled: false,
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
