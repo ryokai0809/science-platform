@@ -169,6 +169,7 @@
 //   return res.status(200).json({ received: true });
 // }
 
+import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Readable } from "stream";
 import Stripe from "stripe";
@@ -194,8 +195,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+
   const sig = req.headers["stripe-signature"];
-  const buf = await getRawBody(req);
+  const buf = await buffer(req);
 
   let event: Stripe.Event;
 
