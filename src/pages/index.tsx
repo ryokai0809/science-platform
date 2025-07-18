@@ -287,6 +287,21 @@ if (u) {
             onClick={() => setSelectedGradeId(null)}
             >{t("lectureSelect")}</Button>
              </div>
+             {!selectedGradeId && (
+  <div className="w-full flex flex-col items-center mt-2">
+    <h3 className="text-xl font-bold mb-4">{t("sampleVideo")}</h3>
+    <div className="w-full max-w-xl aspect-video">
+      <iframe
+        src="https://www.youtube.com/embed/Z5mVj31NR7M"
+        title="サンプル動画"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="w-full h-full rounded-lg shadow-lg"
+      />
+    </div>
+  </div>
+)}
+
           </div>
         )}
       </main>
