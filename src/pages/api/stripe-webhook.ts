@@ -169,9 +169,202 @@
 //   return res.status(200).json({ received: true });
 // }
 
+
+
+// 2枚目
+
+// import { buffer } from "micro";
+// import type { NextApiRequest, NextApiResponse } from "next";
+// import { Readable } from "stream";
+// import Stripe from "stripe";
+// import { stripe } from "@/utils/stripe-server";
+// import { supabaseAdmin } from "@/utils/supabaseServerClient";
+
+// export const config = {
+//   api: {
+//     bodyParser: false,
+//   },
+// };
+
+// async function getRawBody(readable: Readable) {
+//   const chunks = [];
+//   for await (const chunk of readable) {
+//     chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+//   }
+//   return Buffer.concat(chunks);
+// }
+
+// export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+//   if (req.method !== "POST") {
+//     return res.status(405).json({ error: "Method not allowed" });
+//   }
+
+
+//   const sig = req.headers["stripe-signature"];
+//   const buf = await buffer(req);
+
+//   let event: Stripe.Event;
+
+//   try {
+//     event = stripe.webhooks.constructEvent(
+//       buf,
+//       sig!,
+//       process.env.STRIPE_WEBHOOK_SECRET!
+//     );
+//   } catch (err: any) {
+//     console.error("❌ Webhook verify error:", err.message);
+//     return res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+
+//   console.log(`✅ Received event: ${event.type}`);
+
+//   try {
+//     if (event.type === "checkout.session.completed") {
+//       const session = event.data.object as Stripe.Checkout.Session;
+//       const { user_id, juku_id } = session.metadata || {};
+//       const stripeCustomerId = session.customer as string;
+
+//       if (!user_id) {
+//         console.error("❌ metadata missing: user_id");
+//         return res.status(400).send("Missing metadata: user_id");
+//       }
+
+//       console.log("✅ checkout.session.completed:", { user_id, stripeCustomerId });
+
+//       const { error: userUpdateError } = await supabaseAdmin
+//         .from("users")
+//         .update({
+//           is_subscribed: true,
+//           stripe_customer_id: stripeCustomerId,
+//         })
+//         .eq("id", user_id);
+
+//       if (userUpdateError) {
+//         console.error("❌ Supabase user update error:", userUpdateError);
+//         return res.status(500).send("Supabase user update error");
+//       }
+
+//       const { data: license, error: licenseFetchError } = await supabaseAdmin
+//         .from("licenses")
+//         .select("id")
+//         .eq("user_id", user_id)
+//         .maybeSingle();
+
+//       if (licenseFetchError) {
+//         console.error("❌ Supabase license fetch error:", licenseFetchError);
+//         return res.status(500).send("Supabase license fetch error");
+//       }
+
+//       if (license) {
+//         const { error: licenseUpdateError } = await supabaseAdmin
+//           .from("licenses")
+//           .update({
+//             stripe_customer_id: stripeCustomerId,
+//             is_canceled: false,
+//             expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+//           })
+//           .eq("id", license.id);
+
+//         if (licenseUpdateError) {
+//           console.error("❌ Supabase license update error:", licenseUpdateError);
+//           return res.status(500).send("Supabase license update error");
+//         }
+//       } else {
+//         const { error: licenseUpsertError } = await supabaseAdmin
+//           .from("licenses")
+//           .upsert({
+//             user_id,
+//             stripe_customer_id: stripeCustomerId,
+//             is_canceled: false,
+//             expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+//           }, { onConflict: "user_id" });
+
+//         if (licenseUpsertError) {
+//           console.error("❌ Supabase license upsert error:", licenseUpsertError);
+//           return res.status(500).send("Supabase license upsert error");
+//         }
+//       }
+
+//       if (session.amount_total && session.amount_total > 0) {
+//   const { error: salesInsertError } = await supabaseAdmin
+//     .from("sales")
+//     .insert({
+//       user_id,
+//       juku_id: juku_id || null,
+//       amount: session.amount_total,
+//     });
+
+//   if (salesInsertError) {
+//     console.error("❌ Supabase sales insert error:", salesInsertError);
+//     return res.status(500).send("Supabase sales insert error");
+//   }
+
+//   console.log("✅ sales inserted with amount:", session.amount_total);
+// } else {
+//   console.warn("⚠️ session.amount_total is missing or zero, sales record not inserted.");
+// }
+
+
+//       console.log("✅ checkout.session.completed 処理完了");
+//     }
+
+//     if (event.type === "customer.subscription.updated") {
+//       const subscription = event.data.object as Stripe.Subscription & { current_period_end: number };
+
+//       const stripeCustomerId = subscription.customer as string;
+//       const cancelAtPeriodEnd = subscription.cancel_at_period_end;
+
+//       let currentPeriodEnd = Date.now() + 30 * 24 * 60 * 60 * 1000;
+
+//       if (typeof subscription.current_period_end === "number") {
+//         currentPeriodEnd = subscription.current_period_end * 1000;
+//       }
+
+//       const { error: licenseUpdateError } = await supabaseAdmin
+//         .from("licenses")
+//         .update({
+//           is_canceled: cancelAtPeriodEnd,
+//           expires_at: new Date(currentPeriodEnd).toISOString(),
+//         })
+//         .eq("stripe_customer_id", stripeCustomerId);
+
+//       if (licenseUpdateError) {
+//         console.error("❌ Supabase license update error:", licenseUpdateError);
+//         return res.status(500).send("Supabase license update error");
+//       }
+
+//       console.log("✅ customer.subscription.updated 処理完了");
+//     }
+
+//     if (event.type === "customer.subscription.deleted") {
+//       const subscription = event.data.object as Stripe.Subscription;
+//       const stripeCustomerId = subscription.customer as string;
+
+//       const { error: licenseDeleteError } = await supabaseAdmin
+//         .from("licenses")
+//         .update({
+//           is_canceled: true,
+//           expires_at: new Date().toISOString(),
+//         })
+//         .eq("stripe_customer_id", stripeCustomerId);
+
+//       if (licenseDeleteError) {
+//         console.error("❌ Supabase license delete error:", licenseDeleteError);
+//         return res.status(500).send("Supabase license delete error");
+//       }
+
+//       console.log("✅ customer.subscription.deleted 処理完了");
+//     }
+
+//     return res.status(200).json({ received: true });
+//   } catch (err: any) {
+//     console.error("❌ Unexpected error:", err);
+//     return res.status(500).send("Unexpected server error");
+//   }
+// }
+
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Readable } from "stream";
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe-server";
 import { supabaseAdmin } from "@/utils/supabaseServerClient";
@@ -182,19 +375,10 @@ export const config = {
   },
 };
 
-async function getRawBody(readable: Readable) {
-  const chunks = [];
-  for await (const chunk of readable) {
-    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
-}
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
-
 
   const sig = req.headers["stripe-signature"];
   const buf = await buffer(req);
@@ -215,6 +399,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   console.log(`✅ Received event: ${event.type}`);
 
   try {
+    // ✅ checkout.session.completed → ライセンス更新のみ
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const { user_id, juku_id } = session.metadata || {};
@@ -227,7 +412,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log("✅ checkout.session.completed:", { user_id, stripeCustomerId });
 
-      const { error: userUpdateError } = await supabaseAdmin
+      await supabaseAdmin
         .from("users")
         .update({
           is_subscribed: true,
@@ -235,24 +420,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         .eq("id", user_id);
 
-      if (userUpdateError) {
-        console.error("❌ Supabase user update error:", userUpdateError);
-        return res.status(500).send("Supabase user update error");
-      }
-
-      const { data: license, error: licenseFetchError } = await supabaseAdmin
+      const { data: license } = await supabaseAdmin
         .from("licenses")
         .select("id")
         .eq("user_id", user_id)
         .maybeSingle();
 
-      if (licenseFetchError) {
-        console.error("❌ Supabase license fetch error:", licenseFetchError);
-        return res.status(500).send("Supabase license fetch error");
-      }
-
       if (license) {
-        const { error: licenseUpdateError } = await supabaseAdmin
+        await supabaseAdmin
           .from("licenses")
           .update({
             stripe_customer_id: stripeCustomerId,
@@ -260,44 +435,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           })
           .eq("id", license.id);
-
-        if (licenseUpdateError) {
-          console.error("❌ Supabase license update error:", licenseUpdateError);
-          return res.status(500).send("Supabase license update error");
-        }
       } else {
-        const { error: licenseUpsertError } = await supabaseAdmin
+        await supabaseAdmin
           .from("licenses")
           .upsert({
             user_id,
-            grade_id: 999,
             stripe_customer_id: stripeCustomerId,
             is_canceled: false,
             expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           }, { onConflict: "user_id" });
-
-        if (licenseUpsertError) {
-          console.error("❌ Supabase license upsert error:", licenseUpsertError);
-          return res.status(500).send("Supabase license upsert error");
-        }
       }
 
-      const { error: salesInsertError } = await supabaseAdmin
-        .from("sales")
-        .insert({
-          user_id,
-          juku_id: juku_id || null,
-          amount: session.amount_total || 0,
-        });
-
-      if (salesInsertError) {
-        console.error("❌ Supabase sales insert error:", salesInsertError);
-        return res.status(500).send("Supabase sales insert error");
-      }
-
-      console.log("✅ checkout.session.completed 処理完了");
+      console.log("✅ checkout.session.completed: ライセンス更新のみ (sales は invoice.paid で記録)");
     }
 
+    // ✅ customer.subscription.updated → ライセンスの更新のみ
     if (event.type === "customer.subscription.updated") {
       const subscription = event.data.object as Stripe.Subscription & { current_period_end: number };
 
@@ -310,7 +462,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         currentPeriodEnd = subscription.current_period_end * 1000;
       }
 
-      const { error: licenseUpdateError } = await supabaseAdmin
+      await supabaseAdmin
         .from("licenses")
         .update({
           is_canceled: cancelAtPeriodEnd,
@@ -318,19 +470,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         .eq("stripe_customer_id", stripeCustomerId);
 
-      if (licenseUpdateError) {
-        console.error("❌ Supabase license update error:", licenseUpdateError);
-        return res.status(500).send("Supabase license update error");
-      }
-
-      console.log("✅ customer.subscription.updated 処理完了");
+      console.log("✅ customer.subscription.updated: ライセンスのみ更新");
     }
 
+    // ✅ invoice.paid → sales 記録
+    if (event.type === "invoice.paid") {
+      const invoice = event.data.object as Stripe.Invoice;
+
+      const stripeCustomerId = invoice.customer as string;
+      const amountPaid = invoice.amount_paid;
+
+      const license = await supabaseAdmin
+        .from("licenses")
+        .select("user_id, juku_id")
+        .eq("stripe_customer_id", stripeCustomerId)
+        .maybeSingle();
+
+      if (license.data) {
+        await supabaseAdmin
+          .from("sales")
+          .insert({
+            user_id: license.data.user_id,
+            juku_id: license.data.juku_id,
+            amount: amountPaid,
+          });
+        console.log("✅ sales に記録しました (invoice.paid)");
+      } else {
+        console.warn("⚠️ invoice.paid: license が見つかりませんでした");
+      }
+    }
+
+    // ✅ customer.subscription.deleted → ライセンス無効化
     if (event.type === "customer.subscription.deleted") {
       const subscription = event.data.object as Stripe.Subscription;
       const stripeCustomerId = subscription.customer as string;
 
-      const { error: licenseDeleteError } = await supabaseAdmin
+      await supabaseAdmin
         .from("licenses")
         .update({
           is_canceled: true,
@@ -338,12 +513,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         .eq("stripe_customer_id", stripeCustomerId);
 
-      if (licenseDeleteError) {
-        console.error("❌ Supabase license delete error:", licenseDeleteError);
-        return res.status(500).send("Supabase license delete error");
-      }
-
-      console.log("✅ customer.subscription.deleted 処理完了");
+      console.log("✅ customer.subscription.deleted: ライセンス無効化");
     }
 
     return res.status(200).json({ received: true });
