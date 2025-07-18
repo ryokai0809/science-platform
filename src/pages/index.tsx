@@ -97,7 +97,7 @@ setUserId(u);
           setPaidGrades(json.is_subscribed ? [999] : []);
         }
       } else {
-        const { data } = await supabase.from("licenses").select("grade_id, expires_at").eq("user_email", u).gt("expires_at", new Date().toISOString());
+        const { data } = await supabase.from("licenses").select("grade_id, expires_at").eq("user_id", u).gt("expires_at", new Date().toISOString());
         const grades = (data ?? []).map(l => l.grade_id || 999);
         setPaidGrades(grades);
       }
